@@ -2,11 +2,13 @@ const Cart = require('./cartModel')
 const OrderItem = require('../order Items/orderItemModel')
 const User = require('../users/userModel')
 const Product = require('../products/productModel')
+const util = require('util')
+const jwt = require('jsonwebtoken')
 const asyncVerifyUser = util.promisify(jwt.verify);
 const secretKey = process.env.SECRET_KEY
 
 
-const fillCart = (req,res,next)=>{
+const fillCart = async (req,res,next)=>{
     let items = req.items
     let finalItems = []
     const {authorization} = req.headers
@@ -15,7 +17,7 @@ const fillCart = (req,res,next)=>{
         if(!payload){
             throw new Error('you have no permission');
         }
-        items.map(ele=>{
+        items.map(async ele=>{
             let product = await Product.findById(ele.product)
             let orderItem = new OrderItem({...ele,orderPrice:ele.quantity*product.price})
             await orderItem.save()
@@ -30,7 +32,7 @@ const fillCart = (req,res,next)=>{
         next(error)
     }
 }
-const addToCart = (req,res,next)=>{
+const addToCart = async (req,res,next)=>{
     const {authorization} = req.headers
     try{
         let product = await Product.findById(req.orderItem.product)
@@ -51,7 +53,7 @@ const addToCart = (req,res,next)=>{
     }
 }
 
-const removeFromCart = (req,res,next)=>{
+const removeFromCart = async (req,res,next)=>{
     const {authorization} = req.headers
     try{
         const payload = await asyncVerifyUser(authorization, secretKey)
@@ -72,7 +74,7 @@ const removeFromCart = (req,res,next)=>{
     }
 }
 
-const emptyCart = (req,res,next)=>{
+const emptyCart = async (req,res,next)=>{
     const {authorization} = req.headers
     try{
         const payload = await asyncVerifyUser(authorization, secretKey)
@@ -81,7 +83,7 @@ const emptyCart = (req,res,next)=>{
         }
         let user = await User.findById(payload.id)
         let cart = await Cart.findById(user.cartId)
-        cart.items.map(ele=>{
+        cart.items.map(async ele=>{
             await OrderItem.findByIdAndRemove(ele)
         })
         cart.items = []

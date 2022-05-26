@@ -5,8 +5,8 @@ const { logIn } = require('./adminController')
 const { signUp } = require('./adminController')
 const errorHandler = require('../middlewares')
 
-adminRouter.post('/signUp', signUp)
-adminRouter.post('/logIn', logIn)
+adminRouter.post('/signup', signUp)
+adminRouter.post('/login', logIn)
 adminRouter.use(errorHandler)
 
 module.exports = adminRouter

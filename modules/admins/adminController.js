@@ -14,7 +14,9 @@ const signUp = async (req, res, next) => {
     try {
         admin.password = await bcrypt.hash(admin.password, saltRounds)
         await admin.save();
-        res.send("signed up successfully");
+        res.send({
+            message: 'signed up successfully',
+        });
     } catch (error) {
         error.status = 500;
         next(error);

@@ -14,6 +14,7 @@ const orderSchema = new mongoose.Schema({
         default:"cash on delivery"
     },
     totalPrice:Number,
+    shippingAddress:String,
     user:mongoose.Schema.Types.ObjectId,
     dateOrdered:{
         type:Date,

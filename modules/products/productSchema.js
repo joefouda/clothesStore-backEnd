@@ -30,12 +30,15 @@ const productSchema = new mongoose.Schema({
         min: [1, 'must be greater than 0'],
         default:1
     },
-    quantity:{
+    stock:{
         type:Number,
-        min: [1, 'must be greater than 0'],
-        default:1
+        min: [0, 'must be greater than or equal to 0'],
+        default:0
     },
-    reviews:[mongoose.Schema.Types.ObjectId]
+    reviews:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref:'Review'
+    }
 })
 
 module.exports = productSchema

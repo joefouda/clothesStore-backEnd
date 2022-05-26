@@ -15,7 +15,7 @@ const restrictToAdmin = async (req,res,next)=>{
         }
         next()
     } catch (error) {
-        error.status = 404
+        error.status = 401
         next(error)
     }
 }

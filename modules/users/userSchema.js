@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     cartId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Cart'
+    },
+    isBanned:{
+        type:Boolean,
+        default:false
     }
 })
 

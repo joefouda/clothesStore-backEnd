@@ -35,7 +35,22 @@ const update = async(req,res,next)=>{
     }
 }
 
+const getAllProducts = async (req, res, next) => {
+    try {
+        let products = await Product.find()
+        res.send({
+            products
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 module.exports = {
     add,
-    update
+    update,
+    getAllProducts
 }

@@ -1,10 +1,12 @@
 const Order = require('./orderModel')
 const Cart = require('../carts/cartModel')
+const util = require('util')
+const jwt = require('jsonwebtoken') 
 const asyncVerifyUser = util.promisify(jwt.verify);
 const secretKey = process.env.SECRET_KEY
 
 
-const createOrder = (req,res,next)=>{
+const createOrder = async (req,res,next)=>{
     const {authorization} = req.headers
     try{
         const payload = await asyncVerifyUser(authorization, secretKey)
@@ -22,6 +24,20 @@ const createOrder = (req,res,next)=>{
     }
 }
 
+const getAllOrders = async (req,res,next)=>{
+    const {authorization} = req.headers
+    try{
+        const orders = await Order.find()
+        res.send({
+            orders
+        })
+    } catch(error){
+        error.status = 422;
+        next(error)
+    }
+}
+
 module.exports = {
-    createOrder
+    createOrder,
+    getAllOrders
 }

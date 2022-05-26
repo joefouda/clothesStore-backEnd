@@ -71,8 +71,58 @@ const updateUserInfo = async (req, res, next) => {
     }
 }
 
+const getAllUsers = async (req, res, next) => {
+    try {
+        let users = await User.find()
+        res.send({
+            users
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
+const getUsersByName = async (req, res, next) => {
+    try {
+        let users = await User.find({
+            name: { $regex: `${req.params.name}`, $options: 'i' },
+        })
+        res.send({
+            message:users.length?'success':'no users found',
+            users
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
+const changeUserState = async (req, res, next) => {
+    try {
+        let user = await User.findById(req.params.id)
+        console.log(user)
+        await User.findByIdAndUpdate(req.params.id,{isBanned:user.isBanned?false:true})
+        res.send({
+            message:`User ${user.isBanned?'activated successfully':'Banned Successfully'}`
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 module.exports = {
     logIn,
     signUp,
-    updateUserInfo
+    updateUserInfo,
+    getAllUsers,
+    getUsersByName,
+    changeUserState
 }
