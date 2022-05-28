@@ -5,17 +5,21 @@ const orderSchema = new mongoose.Schema({
         type:[mongoose.Schema.Types.ObjectId],
         ref:'OrderItem'
     },
-    status:{
+    state:{
         type:String,
         default:"pending"
     },
     paymentMethod:{
         type:String,
-        default:"cash on delivery"
     },
     totalPrice:Number,
     shippingAddress:String,
-    user:mongoose.Schema.Types.ObjectId,
+    phone:Number,
+    User:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User',
+        required:true
+    },
     dateOrdered:{
         type:Date,
         default:Date.now   

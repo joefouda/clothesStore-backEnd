@@ -1,5 +1,5 @@
 const Cart = require('./cartModel')
-const OrderItem = require('../order Items/orderItemModel')
+const OrderItem = require('../orderItems/orderItemModel')
 const User = require('../users/userModel')
 const Product = require('../products/productModel')
 const util = require('util')
@@ -7,36 +7,11 @@ const jwt = require('jsonwebtoken')
 const asyncVerifyUser = util.promisify(jwt.verify);
 const secretKey = process.env.SECRET_KEY
 
-
-const fillCart = async (req,res,next)=>{
-    let items = req.items
-    let finalItems = []
-    const {authorization} = req.headers
-    try{
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if(!payload){
-            throw new Error('you have no permission');
-        }
-        items.map(async ele=>{
-            let product = await Product.findById(ele.product)
-            let orderItem = new OrderItem({...ele,orderPrice:ele.quantity*product.price})
-            await orderItem.save()
-            finalItems.push(orderItem._id)
-        })
-        let cart = new Cart({items:finalItems})
-        await cart.save()
-        await User.findByIdAndUpdate(payload.id,{cartId:cart._id})
-        res.send('Cart filled successfully')
-    } catch(error){
-        error.status = 422;
-        next(error)
-    }
-}
 const addToCart = async (req,res,next)=>{
     const {authorization} = req.headers
     try{
-        let product = await Product.findById(req.orderItem.product)
-        let orderItem = new OrderItem({...req.orderItem,orderPrice:req.orderItem.quantity*product.price})
+        let product = await Product.findById(req.body.product)
+        let orderItem = new OrderItem({...req.body,orderPrice:req.body.quantity*product.price})
         const payload = await asyncVerifyUser(authorization, secretKey)
         if(!payload){
             throw new Error('you have no permission');
@@ -44,7 +19,10 @@ const addToCart = async (req,res,next)=>{
         await orderItem.save()
         let user = await User.findById(payload.id)
         let cart = await Cart.findById(user.cartId)
-        cart.items.push(orderItem._id)
+        await Cart.findOneAndUpdate(
+            { _id: cart._id },
+            { $push: { items: orderItem._id } }
+        );
         await cart.save()
         res.send('item added successfully')
     } catch(error){
@@ -63,9 +41,10 @@ const removeFromCart = async (req,res,next)=>{
         let user = await User.findById(payload.id)
         let cart = await Cart.findById(user.cartId)
         await OrderItem.findByIdAndRemove(req.params.id)
-        cart.items.filter(ele=>{
-            return ele !== req.params.id
-        })
+        await Cart.findOneAndUpdate(
+            { _id: cart._id },
+            { $pull: { items: req.params.id } }
+        );
         await cart.save()
         res.send('item removed successfully')
     } catch(error){
@@ -86,7 +65,11 @@ const emptyCart = async (req,res,next)=>{
         cart.items.map(async ele=>{
             await OrderItem.findByIdAndRemove(ele)
         })
-        cart.items = []
+        await Cart.findOneAndUpdate(
+            { _id: cart._id },
+            {  items: [] } 
+        );
+        
         await cart.save()
         res.send('Cart unloaded successfully')
     } catch(error){
@@ -95,8 +78,7 @@ const emptyCart = async (req,res,next)=>{
     }
 }
 
-module.exports = {
-    fillCart,
+module.exports = {  
     addToCart,
     emptyCart,
     removeFromCart

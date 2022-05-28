@@ -1,7 +1,7 @@
 const SubCategory = require('./subCategoryModel')
 const Category = require('../categories/categoryModel')
 const Spec = require('../specs/specModel')
-const { findById } = require('./subCategoryModel')
+
 const add = async (req, res, next) => {
     try {
         let subCategory = new SubCategory({photo:req.body.photo, name:req.body.name, category:req.body.category})

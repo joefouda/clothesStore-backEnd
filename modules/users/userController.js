@@ -1,4 +1,5 @@
 const User = require('./userModel')
+const Cart = require('../carts/cartModel')
 const bcrypt = require('bcrypt')
 const util = require('util')
 const jwt = require('jsonwebtoken')
@@ -12,7 +13,10 @@ const secretKey = process.env.SECRET_KEY
 const signUp = async (req, res, next) => {
     let user = new User(req.body);  
     try {
+        let cart = new Cart({items:[]})
+        await cart.save()
         user.password = await bcrypt.hash(user.password, saltRounds)
+        user.cartId = cart._id
         await user.save();
         res.send("signed up successfully");
     } catch (error) {
