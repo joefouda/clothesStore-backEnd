@@ -6,11 +6,12 @@ const add = async (req, res, next) => {
     try {
         let subCategory = new SubCategory({photo:req.body.photo, name:req.body.name, category:req.body.category})
         let specs = req.body.specs
-        let category = await Category.findById(req.body.category)   
-        let subCategoryArray = category.subCategories
         await subCategory.save()
-        subCategoryArray.push(subCategory._id)
-        await Category.findOneAndUpdate(req.body.category,{ subCategories:subCategoryArray })
+        
+        await Category.findOneAndUpdate(
+            { _id: req.body.category },
+            { $push: { subCategories: subCategory._id } }
+        )
 
         specs.forEach(async ele=>{
             let spec = new Spec(ele)
