@@ -7,7 +7,7 @@ const add = async (req, res, next) => {
         let subCategory = new SubCategory({photo:req.body.photo, name:req.body.name, category:req.body.category})
         let specs = req.body.specs
         await subCategory.save()
-        
+
         await Category.findOneAndUpdate(
             { _id: req.body.category },
             { $push: { subCategories: subCategory._id } }
@@ -43,7 +43,7 @@ const update = async (req, res, next) => {
             let spec = new Spec(ele)
             await spec.save()
 
-            await SubCategory.findOneAndUpdate(
+            await SubCategory.findByIdAndUpdate(
                 id,
                 { $push: { specs: spec._id } }
             );
