@@ -1,20 +1,17 @@
 const express = require('express');
 const userRouter = express.Router();
 const { restrictToAdmin } = require('../auth')
-const { logIn } = require('./userController')
-const { signUp } = require('./userController')
-const { updateUserInfo } = require('./userController')
-const { getAllUsers } = require('./userController')
-const { changeUserState } = require('./userController')
-const { getUsersByName } = require('./userController')
+const { logIn, signUp, updateUserInfo, getAllUsers, changeUserState, getUsersByName, addToFavorites, getFavorites } = require('./userController')
 const errorHandler = require('../middlewares')
 
 userRouter.post('/signUp', signUp)
 userRouter.post('/logIn', logIn)
 userRouter.put('/update', updateUserInfo)
 userRouter.get('/', restrictToAdmin, getAllUsers)
-userRouter.get('/:name', restrictToAdmin, getUsersByName)
+userRouter.get('/search/:name', restrictToAdmin, getUsersByName)
 userRouter.put('/toggleState/:id', restrictToAdmin, changeUserState)
+userRouter.put('/', addToFavorites)
+userRouter.get('/favorites', getFavorites)
 
 userRouter.use(errorHandler)
 

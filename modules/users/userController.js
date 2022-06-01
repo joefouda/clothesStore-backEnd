@@ -122,11 +122,54 @@ const changeUserState = async (req, res, next) => {
     }
 }
 
+const addToFavorites = async (req, res, next) => {
+    const {authorization} = req.headers
+    try {
+        const payload = await asyncVerifyUser(authorization, secretKey)
+        if(!payload){
+            throw new Error('you have no permission');
+        }
+        await User.findByIdAndUpdate(
+            payload.id,
+            { $push: { favorites: req.body.productId } }
+        );
+        res.send({
+            message:`Product Added to Favorites Successfully`
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
+const getFavorites = async (req, res, next) => {
+    const {authorization} = req.headers
+    try {
+        const payload = await asyncVerifyUser(authorization, secretKey)
+        if(!payload){
+            throw new Error('you have no permission');
+        }
+        const user = await User.findById(payload.id).populate('favorites');
+        res.send({
+            favoriteProducts:user.favorites
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 module.exports = {
     logIn,
     signUp,
     updateUserInfo,
     getAllUsers,
     getUsersByName,
-    changeUserState
+    changeUserState,
+    addToFavorites,
+    getFavorites   
 }

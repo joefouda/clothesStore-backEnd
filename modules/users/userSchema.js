@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
     isBanned:{
         type:Boolean,
         default:false
+    },
+    favorites:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref:'Product'
     }
 })
 

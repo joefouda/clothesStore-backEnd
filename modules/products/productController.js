@@ -1,5 +1,6 @@
 const Product = require('./productModel')
 const SubCategory = require('../sub categories/subCategoryModel')
+const Category = require('../categories/categoryModel')
 
 const add = async(req,res,next)=>{
     try{
@@ -49,8 +50,24 @@ const getAllProducts = async (req, res, next) => {
     }
 }
 
+const getProductsByCategoryName = async(req, res, next) => {
+    try {
+        const category = await Category.findOne({name:req.params.name})
+        let products = await Product.find({category:category._id})
+        res.send({
+            products
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 module.exports = {
     add,
     update,
-    getAllProducts
+    getAllProducts,
+    getProductsByCategoryName
 }
