@@ -59,7 +59,22 @@ const update = async (req, res, next) => {
     }
 }
 
+const getSubCategoryById = async (req, res, next) => {
+    let id = req.params.id
+    try {
+        let subCategory = await SubCategory.findById(id)
+        res.send({
+            message:'found',
+            subCategory
+        })
+    } catch (error) {
+        error.status = 404;
+        next(error)
+    }
+}
+
 module.exports = {
     add,
-    update
+    update,
+    getSubCategoryById
 }

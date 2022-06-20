@@ -30,6 +30,10 @@ const productSchema = new mongoose.Schema({
         min: [1, 'must be greater than 0'],
         default:1
     },
+    model:{
+        type:String,
+        required:true
+    },
     stock:{
         type:Number,
         min: [0, 'must be greater than or equal to 0'],
