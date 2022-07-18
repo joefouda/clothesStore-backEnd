@@ -62,7 +62,21 @@ const update = async (req, res, next) => {
 const getSubCategoryById = async (req, res, next) => {
     let id = req.params.id
     try {
-        let subCategory = await SubCategory.findById(id)
+        let subCategory = await SubCategory.findById(id).populate('specs')
+        res.send({
+            message:'found',
+            subCategory
+        })
+    } catch (error) {
+        error.status = 404;
+        next(error)
+    }
+}
+
+const getSubCategoryByName = async (req, res, next) => {
+    let name = req.params.name
+    try {
+        let subCategory = await SubCategory.findOne({name}).populate('specs')
         res.send({
             message:'found',
             subCategory
@@ -76,5 +90,6 @@ const getSubCategoryById = async (req, res, next) => {
 module.exports = {
     add,
     update,
-    getSubCategoryById
+    getSubCategoryById,
+    getSubCategoryByName
 }

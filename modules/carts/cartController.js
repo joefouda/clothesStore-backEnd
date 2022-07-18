@@ -1,7 +1,6 @@
 const Cart = require('./cartModel')
 const OrderItem = require('../orderItems/orderItemModel')
 const User = require('../users/userModel')
-const Product = require('../products/productModel')
 const util = require('util')
 const jwt = require('jsonwebtoken')
 const asyncVerifyUser = util.promisify(jwt.verify);
@@ -10,8 +9,7 @@ const secretKey = process.env.SECRET_KEY
 const addToCart = async (req,res,next)=>{
     const {authorization} = req.headers
     try{
-        let product = await Product.findById(req.body.product)
-        let orderItem = new OrderItem({...req.body,orderPrice:req.body.quantity*product.price})
+        let orderItem = new OrderItem({...req.body})
         const payload = await asyncVerifyUser(authorization, secretKey)
         if(!payload){
             throw new Error('you have no permission');

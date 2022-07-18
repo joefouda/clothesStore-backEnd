@@ -25,6 +25,7 @@ const productSchema = new mongoose.Schema({
             value:String
         }
     ],
+    description:String,
     price:{
         type:Number,
         min: [1, 'must be greater than 0'],

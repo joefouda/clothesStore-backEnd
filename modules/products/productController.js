@@ -6,15 +6,16 @@ const uuid = require('uuid');
 const add = async(req,res,next)=>{
     try{
         let uniqueId = uuid.v4()
-        let product = new Product({...req.body,model:req.body.model?req.body.model:uniqueId})
+        let product = new Product({...req.body,model:req.body.model !== 'new'?req.body.model:uniqueId})
         let subCategory = await SubCategory.findById(req.body.subCategory)
         let productsArray = subCategory.products
         await product.save()
         productsArray.push(product._id)
-        if(req.body.model){
+        if(req.body.model !== 'new'){
             await SubCategory.findByIdAndUpdate(req.body.subCategory,{products:productsArray})
+        }else{
+            await SubCategory.findByIdAndUpdate(req.body.subCategory,{products:productsArray,$push: { models: uniqueId }})
         }
-        await SubCategory.findByIdAndUpdate(req.body.subCategory,{products:productsArray,$push: { models: uniqueId }})
         res.send('product added successfully')
     }catch(error){
         error.status = 422;
@@ -55,6 +56,20 @@ const getAllProducts = async (req, res, next) => {
     }
 }
 
+const getProductById = async(req, res, next) => {
+    try {
+        let product = await Product.findById(req.params.id)
+        res.send({
+            product
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 const getProductsByCategoryName = async(req, res, next) => {
     try {
         const category = await Category.findOne({name:req.params.name})
@@ -70,9 +85,60 @@ const getProductsByCategoryName = async(req, res, next) => {
     }
 }
 
+const getProductsBySubCategoryName = async(req, res, next) => {
+    try {
+        const subCategory = await SubCategory.findOne({name:req.params.name})
+        let products = await Product.find({subCategory:subCategory._id})
+        res.send({
+            products
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
+const getProductsByModel = async(req, res, next) => {
+    try {
+        let products = await Product.find({model:req.params.model})
+        res.send({
+            products
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
+const getProductByModelAndSpecs = async(req, res, next) => {
+    try {
+        let products = await Product.find({model:req.body.model})
+        let product = products.find(product=>req.body.specs.every((ele,index)=>{
+                return product.specs[index].value === ele.value
+        }))
+        if(!product) res.send({message:'notfound'})
+        res.send({
+            product
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 module.exports = {
     add,
     update,
     getAllProducts,
-    getProductsByCategoryName
+    getProductById,
+    getProductsByCategoryName,
+    getProductsBySubCategoryName,
+    getProductsByModel,
+    getProductByModelAndSpecs
 }
