@@ -3,6 +3,7 @@ const Cart = require('../carts/cartModel')
 const bcrypt = require('bcrypt')
 const util = require('util')
 const jwt = require('jsonwebtoken')
+const { response } = require('express')
 const saltRounds = 10;
 
 //make jason web token functions async using util
@@ -11,12 +12,12 @@ const asyncVerifyUser = util.promisify(jwt.verify);
 const secretKey = process.env.SECRET_KEY
 
 const signUp = async (req, res, next) => {
-    let user = new User(req.body);  
+    let user = new User(req.body);
     try {
-        let cart = new Cart({items:[]})
+        let cart = new Cart({ items: [] })
         await cart.save()
         user.password = await bcrypt.hash(user.password, saltRounds)
-        user.cartId = cart._id
+        user.cart = cart._id
         await user.save();
         res.send("signed up successfully");
     } catch (error) {
@@ -28,7 +29,7 @@ const signUp = async (req, res, next) => {
 const logIn = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email }).populate('cart');
         if (!user) {
             throw new Error('invalid email or password');
         }
@@ -42,7 +43,8 @@ const logIn = async (req, res, next) => {
         }, secretKey)
         res.send({
             message: 'logged in successfully',
-            token
+            token,
+            cart:user.cart.items
         })
     }
     catch (error) {
@@ -53,19 +55,19 @@ const logIn = async (req, res, next) => {
 
 const updateUserInfo = async (req, res, next) => {
     const { name, email, address } = req.body
-    const {authorization} = req.headers
+    const { authorization } = req.headers
     try {
         const payload = await asyncVerifyUser(authorization, secretKey)
-        if(!payload){
+        if (!payload) {
             throw new Error('you have no permission');
         }
         let id = payload.id
-        const user = await User.findOneAndUpdate(id,{name:name,email:email,address:address},{new:true});
+        const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true });
         if (!user) {
             throw new Error('no user found');
-        } 
+        }
         res.send({
-            message:"updated successfuly",
+            message: "updated successfuly",
             user
         })
     }
@@ -95,7 +97,7 @@ const getUsersByName = async (req, res, next) => {
             name: { $regex: `${req.params.name}`, $options: 'i' },
         })
         res.send({
-            message:users.length?'success':'no users found',
+            message: users.length ? 'success' : 'no users found',
             users
         })
     }
@@ -109,10 +111,9 @@ const getUsersByName = async (req, res, next) => {
 const changeUserState = async (req, res, next) => {
     try {
         let user = await User.findById(req.params.id)
-        console.log(user)
-        await User.findByIdAndUpdate(req.params.id,{isBanned:user.isBanned?false:true})
+        await User.findByIdAndUpdate(req.params.id, { isBanned: user.isBanned ? false : true })
         res.send({
-            message:`User ${user.isBanned?'activated successfully':'Banned Successfully'}`
+            message: `User ${user.isBanned ? 'activated successfully' : 'Banned Successfully'}`
         })
     }
     catch (error) {
@@ -123,18 +124,51 @@ const changeUserState = async (req, res, next) => {
 }
 
 const addToFavorites = async (req, res, next) => {
-    const {authorization} = req.headers
+    const { authorization } = req.headers
     try {
         const payload = await asyncVerifyUser(authorization, secretKey)
-        if(!payload){
+        if (!payload) {
             throw new Error('you have no permission');
         }
-        await User.findByIdAndUpdate(
+        let user = await User.findById(payload.id)
+        let responseUser = await User.findById(payload.id).populate('favorites');
+        if (user.favorites.includes(req.body.productId)) res.send({user:responseUser, message: `Product Already exists` })
+        else {
+            let newUser = await User.findByIdAndUpdate(
+                payload.id,
+                { $push: { favorites: req.body.productId } },
+                { new: true }
+            ).populate('favorites');
+
+            res.send({
+                user: newUser,
+                message: `Product Added to Favorites Successfully`
+            })
+        }
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
+const removeFromFavorites = async (req, res, next) => {
+    const { authorization } = req.headers
+    try {
+        const payload = await asyncVerifyUser(authorization, secretKey)
+        if (!payload) {
+            throw new Error('you have no permission');
+        }
+        let newUser = await User.findByIdAndUpdate(
             payload.id,
-            { $push: { favorites: req.body.productId } }
-        );
+            { $pull: { favorites: req.body.productId } },
+            { new: true }
+        ).populate('favorites');
+
         res.send({
-            message:`Product Added to Favorites Successfully`
+            user: newUser,
+            message: `Product Removed from Favorites Successfully`
         })
     }
     catch (error) {
@@ -145,15 +179,15 @@ const addToFavorites = async (req, res, next) => {
 }
 
 const getFavorites = async (req, res, next) => {
-    const {authorization} = req.headers
+    const { authorization } = req.headers
     try {
         const payload = await asyncVerifyUser(authorization, secretKey)
-        if(!payload){
+        if (!payload) {
             throw new Error('you have no permission');
         }
         const user = await User.findById(payload.id).populate('favorites');
         res.send({
-            favoriteProducts:user.favorites
+            favorites: user.favorites
         })
     }
     catch (error) {
@@ -171,5 +205,6 @@ module.exports = {
     getUsersByName,
     changeUserState,
     addToFavorites,
-    getFavorites   
+    removeFromFavorites,
+    getFavorites
 }

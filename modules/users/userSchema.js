@@ -14,20 +14,21 @@ const userSchema = new mongoose.Schema({
         type:String,
         minlength:8
     },
-    photo:String,
     orders:{
         type:[mongoose.Schema.Types.ObjectId],
         ref:'Order'
     },
     address:{
-        type:String,
-        required:true
+        country:String,
+        province:String,
+        street:String,
+        details:String
     },
     phone:{
         type:String,
         length:11
     },
-    cartId:{
+    cart:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Cart'
     },

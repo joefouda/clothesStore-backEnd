@@ -71,9 +71,10 @@ const getProductById = async(req, res, next) => {
 }
 
 const getProductsByCategoryName = async(req, res, next) => {
+    let products = []
     try {
         const category = await Category.findOne({name:req.params.name})
-        let products = await Product.find({category:category._id})
+        if(category) products = await Product.find({category:category._id})
         res.send({
             products
         })
@@ -86,9 +87,10 @@ const getProductsByCategoryName = async(req, res, next) => {
 }
 
 const getProductsBySubCategoryName = async(req, res, next) => {
+    let products = []
     try {
         const subCategory = await SubCategory.findOne({name:req.params.name})
-        let products = await Product.find({subCategory:subCategory._id})
+        if(subCategory) products = await Product.find({subCategory:subCategory._id})
         res.send({
             products
         })
