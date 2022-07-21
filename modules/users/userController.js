@@ -29,7 +29,19 @@ const signUp = async (req, res, next) => {
 const logIn = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email: email }).populate('cart');
+        const user = await User.findOne({ email: email }).populate('cart').populate('favorites').populate({
+            path: 'favorites',
+            populate:{
+                path:'category',
+                model:'Category'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'subCategory',
+                model:'SubCategory'
+            }    
+        });
         if (!user) {
             throw new Error('invalid email or password');
         }
@@ -44,7 +56,7 @@ const logIn = async (req, res, next) => {
         res.send({
             message: 'logged in successfully',
             token,
-            cart:user.cart.items
+            user
         })
     }
     catch (error) {
@@ -131,14 +143,38 @@ const addToFavorites = async (req, res, next) => {
             throw new Error('you have no permission');
         }
         let user = await User.findById(payload.id)
-        let responseUser = await User.findById(payload.id).populate('favorites');
+        let responseUser = await User.findById(payload.id).populate('favorites').populate({
+            path: 'favorites',
+            populate:{
+                path:'category',
+                model:'Category'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'subCategory',
+                model:'SubCategory'
+            }    
+        });
         if (user.favorites.includes(req.body.productId)) res.send({user:responseUser, message: `Product Already exists` })
         else {
             let newUser = await User.findByIdAndUpdate(
                 payload.id,
                 { $push: { favorites: req.body.productId } },
                 { new: true }
-            ).populate('favorites');
+            ).populate('favorites').populate({
+                path: 'favorites',
+                populate:{
+                    path:'category',
+                    model:'Category'
+                }    
+            }).populate({
+                path: 'favorites',
+                populate:{
+                    path:'subCategory',
+                    model:'SubCategory'
+                }    
+            });
 
             res.send({
                 user: newUser,
@@ -164,7 +200,19 @@ const removeFromFavorites = async (req, res, next) => {
             payload.id,
             { $pull: { favorites: req.body.productId } },
             { new: true }
-        ).populate('favorites');
+        ).populate('favorites').populate({
+            path: 'favorites',
+            populate:{
+                path:'category',
+                model:'Category'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'subCategory',
+                model:'SubCategory'
+            }    
+        });
 
         res.send({
             user: newUser,
@@ -185,7 +233,19 @@ const getFavorites = async (req, res, next) => {
         if (!payload) {
             throw new Error('you have no permission');
         }
-        const user = await User.findById(payload.id).populate('favorites');
+        const user = await User.findById(payload.id).populate('favorites').populate({
+            path: 'favorites',
+            populate:{
+                path:'category',
+                model:'Category'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'subCategory',
+                model:'SubCategory'
+            }    
+        });
         res.send({
             favorites: user.favorites
         })

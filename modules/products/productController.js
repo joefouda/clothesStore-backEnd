@@ -27,11 +27,10 @@ const update = async(req,res,next)=>{
     let id = req.params.id
     let data = req.body
     try{
-        let product = await Product.findByIdAndUpdate(id,data,{new:true})
+        let product = await Product.findByIdAndUpdate(id,data,{new:true}).populate('subCategory').populate('category')
         if(!product){
             throw new Error('no product found')
         }
-        await product.save()
         res.send({
             message:'product updated successfully',
             product
@@ -44,7 +43,7 @@ const update = async(req,res,next)=>{
 
 const getAllProducts = async (req, res, next) => {
     try {
-        let products = await Product.find()
+        let products = await Product.find().populate('subCategory').populate('category')
         res.send({
             products
         })
@@ -58,7 +57,7 @@ const getAllProducts = async (req, res, next) => {
 
 const getProductById = async(req, res, next) => {
     try {
-        let product = await Product.findById(req.params.id)
+        let product = await Product.findById(req.params.id).populate('subCategory').populate('category')
         res.send({
             product
         })
@@ -74,7 +73,7 @@ const getProductsByCategoryName = async(req, res, next) => {
     let products = []
     try {
         const category = await Category.findOne({name:req.params.name})
-        if(category) products = await Product.find({category:category._id})
+        if(category) products = await Product.find({category:category._id}).populate('subCategory').populate('category')
         res.send({
             products
         })
@@ -90,7 +89,7 @@ const getProductsBySubCategoryName = async(req, res, next) => {
     let products = []
     try {
         const subCategory = await SubCategory.findOne({name:req.params.name})
-        if(subCategory) products = await Product.find({subCategory:subCategory._id})
+        if(subCategory) products = await Product.find({subCategory:subCategory._id}).populate('subCategory').populate('category')
         res.send({
             products
         })
@@ -104,7 +103,7 @@ const getProductsBySubCategoryName = async(req, res, next) => {
 
 const getProductsByModel = async(req, res, next) => {
     try {
-        let products = await Product.find({model:req.params.model})
+        let products = await Product.find({model:req.params.model}).populate('subCategory').populate('category')
         res.send({
             products
         })
@@ -118,7 +117,7 @@ const getProductsByModel = async(req, res, next) => {
 
 const getProductByModelAndSpecs = async(req, res, next) => {
     try {
-        let products = await Product.find({model:req.body.model})
+        let products = await Product.find({model:req.body.model}).populate('subCategory').populate('category')
         let product = products.find(product=>req.body.specs.every((ele,index)=>{
                 return product.specs[index].value === ele.value
         }))

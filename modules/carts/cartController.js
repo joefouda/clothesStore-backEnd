@@ -18,7 +18,19 @@ const addToCart = async (req, res, next) => {
             path: 'items',
             populate: {
                 path: 'product',
-                model: 'Product',
+                populate:{
+                    path:'category',
+                    model:'Category'
+                }
+            }
+        }).populate({
+            path: 'items',
+            populate: {
+                path: 'product',
+                populate:{
+                    path:'subCategory',
+                    model:'SubCategory'
+                },
             }
         })
         if (responseCart.items.length !== 0 && responseCart.items.some(ele=>ele.product._id == req.body.product._id)){
@@ -34,9 +46,21 @@ const addToCart = async (req, res, next) => {
                 path: 'items',
                 populate: {
                     path: 'product',
-                    model: 'Product',
+                    populate:{
+                        path:'category',
+                        model:'Category'
+                    }
                 }
-            });
+            }).populate({
+                path: 'items',
+                populate: {
+                    path: 'product',
+                    populate:{
+                        path:'subCategory',
+                        model:'SubCategory'
+                    },
+                }
+            })
             res.send({ cart: cart.items, message: 'item added successfully' })
         }
 
@@ -64,7 +88,19 @@ const removeFromCart = async (req, res, next) => {
             path: 'items',
             populate: {
                 path: 'product',
-                model: 'Product',
+                populate:{
+                    path:'category',
+                    model:'Category'
+                }
+            }
+        }).populate({
+            path: 'items',
+            populate: {
+                path: 'product',
+                populate:{
+                    path:'subCategory',
+                    model:'SubCategory'
+                },
             }
         })
         res.send({ cart: cart.items, message: 'item removed successfully' })
@@ -111,10 +147,21 @@ const getCart = async (req, res, next) => {
             path: 'items',
             populate: {
                 path: 'product',
-                model: 'Product',
+                populate:{
+                    path:'category',
+                    model:'Category'
+                }
+            }
+        }).populate({
+            path: 'items',
+            populate: {
+                path: 'product',
+                populate:{
+                    path:'subCategory',
+                    model:'SubCategory'
+                },
             }
         })
-
         res.send({ cart: cart.items })
     } catch (error) {
         error.status = 422;
