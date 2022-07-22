@@ -29,7 +29,7 @@ const signUp = async (req, res, next) => {
 const logIn = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email: email }).populate('cart').populate('favorites').populate({
+        const user = await User.findOne({ email: email }).populate('cart').populate('orders').populate('favorites').populate({
             path: 'favorites',
             populate:{
                 path:'category',
@@ -74,7 +74,19 @@ const updateUserInfo = async (req, res, next) => {
             throw new Error('you have no permission');
         }
         let id = payload.id
-        const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true });
+        const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true }).populate('cart').populate('orders').populate('favorites').populate({
+            path: 'favorites',
+            populate:{
+                path:'category',
+                model:'Category'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'subCategory',
+                model:'SubCategory'
+            }    
+        });
         if (!user) {
             throw new Error('no user found');
         }
