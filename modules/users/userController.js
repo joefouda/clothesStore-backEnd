@@ -41,7 +41,35 @@ const logIn = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
-        });
+        }).populate('orders').populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'category',
+                        model:'Category'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'subCategory',
+                        model:'SubCategory'
+                    }
+                }
+            }
+        })
         if (!user) {
             throw new Error('invalid email or password');
         }
@@ -74,7 +102,7 @@ const updateUserInfo = async (req, res, next) => {
             throw new Error('you have no permission');
         }
         let id = payload.id
-        const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true }).populate('cart').populate('orders').populate('favorites').populate({
+        const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true }).populate('cart').populate('favorites').populate({
             path: 'favorites',
             populate:{
                 path:'category',
@@ -86,7 +114,35 @@ const updateUserInfo = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
-        });
+        }).populate('orders').populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'category',
+                        model:'Category'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'subCategory',
+                        model:'SubCategory'
+                    }
+                }
+            }
+        })
         if (!user) {
             throw new Error('no user found');
         }

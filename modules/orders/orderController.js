@@ -1,6 +1,4 @@
 const Order = require('./orderModel')
-const Cart = require('../carts/cartModel')
-const OrderItem = require('../orderItems/orderItemModel')
 const User = require('../users/userModel')
 const util = require('util')
 const jwt = require('jsonwebtoken')
@@ -15,21 +13,48 @@ const createOrder = async (req, res, next) => {
         if (!payload) {
             throw new Error('you have no permission');
         }
-        let user = await User.findById(payload.id)
-        let cart = await Cart.findById(user.cartId)
-        let order = new Order({ ...req.body, orderItems: cart.items, User: payload.id })
+        let order = new Order({ ...req.body, user: payload.id })
         await order.save()
 
-        let totalPrice = 0
-        cart.items.map(async ele => {
-            let orderItem = await OrderItem.findById(ele)
-            totalPrice += orderItem.orderPrice
-            await Order.findOneAndUpdate(
-                { _id: order._id },
-                { totalPrice }
-            );
-        })
-        res.send('Order created successfully')
+        let newUser = await User.findByIdAndUpdate(
+            payload.id,
+            { $push: { orders: order._id } },
+            { new: true }).populate('orders').populate({
+                path:'orders',
+                populate:{
+                    path:'orderItems',
+                    model:'OrderItem',
+                    populate:{
+                        path:'product',
+                        model:'Product',
+                        populate:{
+                            path:'category',
+                            model:'Category'
+                        }
+                    }
+                }
+            }).populate({
+                path:'orders',
+                populate:{
+                    path:'orderItems',
+                    model:'OrderItem',
+                    populate:{
+                        path:'product',
+                        model:'Product',
+                        populate:{
+                            path:'category',
+                            model:'Category'
+                        },
+                        populate:{
+                            path:'subCategory',
+                            model:'SubCategory'
+                        }
+                    }
+                }
+            })
+
+        res.send({ user:newUser, message: 'Order created successfully' })
+
     } catch (error) {
         error.status = 422;
         next(error)
@@ -70,7 +95,7 @@ const getAllOrders = async (req, res, next) => {
 
 const changeOrderState = async (req, res, next) => {
     try {
-        await Order.findByIdAndUpdate(req.body.id,{state:req.body.state})
+        await Order.findByIdAndUpdate(req.body.id, { state: req.body.state })
 
         res.send(`Order State Changed to ${req.body.state} Successfully`)
     } catch (error) {

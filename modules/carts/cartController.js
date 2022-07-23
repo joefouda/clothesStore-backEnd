@@ -119,11 +119,8 @@ const emptyCart = async (req, res, next) => {
         }
         let user = await User.findById(payload.id)
         let cart = await Cart.findById(user.cart)
-        cart.items.map(async ele => {
-            await OrderItem.findByIdAndRemove(ele)
-        })
         await Cart.findOneAndUpdate(
-            { _id: cart._id },
+            cart._id,
             { items: [] }
         );
 

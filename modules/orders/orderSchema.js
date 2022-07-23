@@ -12,10 +12,14 @@ const orderSchema = new mongoose.Schema({
     paymentMethod:{
         type:String,
     },
-    totalPrice:Number,
-    shippingAddress:String,
-    phone:Number,
-    User:{
+    grandTotal:Number,
+    shippingAddress:{
+        country:String,
+        province:String,
+        street:String,
+        details:String
+    },
+    user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
