@@ -51,6 +51,12 @@ const createOrder = async (req, res, next) => {
                         }
                     }
                 }
+            }).populate({
+                path:'orders',
+                populate:{
+                    path:'user',
+                    model:'User',
+                }
             })
 
         res.send({ user:newUser, message: 'Order created successfully' })

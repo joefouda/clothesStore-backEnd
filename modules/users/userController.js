@@ -29,7 +29,7 @@ const signUp = async (req, res, next) => {
 const logIn = async (req, res, next) => {
     const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email: email }).populate('cart').populate('orders').populate('favorites').populate({
+        const user = await User.findOne({ email: email }).populate('cart').populate('favorites').populate({
             path: 'favorites',
             populate:{
                 path:'category',
@@ -68,6 +68,12 @@ const logIn = async (req, res, next) => {
                         model:'SubCategory'
                     }
                 }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'user',
+                model:'User',
             }
         })
         if (!user) {
