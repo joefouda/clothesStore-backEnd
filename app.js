@@ -13,6 +13,7 @@ const productRouter = require('./modules/products/productRouter')
 const cartRouter = require('./modules/carts/cartRouter')
 const orderRouter = require('./modules/orders/orderRouter')
 const imageRouter = require('./modules/images/imageRouter')
+const orderItemRouter = require('./modules/orderItems/orderItemRouter')
 
 
 app.use(cors())
@@ -32,6 +33,7 @@ app.use(`${api}/product`, productRouter)
 app.use(`${api}/cart`, cartRouter)
 app.use(`${api}/order`, orderRouter)
 app.use(`${api}/image`, imageRouter)
+app.use(`${api}/orderitem`, orderItemRouter)
 
 mongoose.connect('mongodb://localhost:27017/clothes-shope');
 app.listen(3000, () => {
