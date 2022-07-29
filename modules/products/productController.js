@@ -55,6 +55,23 @@ const getAllProducts = async (req, res, next) => {
     }
 }
 
+const queryProductByName = async (req, res, next) => {
+    try {
+        let products = await Product.find({
+            name: { $regex: `${req.params.name}`},
+        }).populate('subCategory').populate('category')
+
+        res.send({
+            products
+        })
+    }
+    catch (error) {
+        error.status = 500;
+        error.message = "internal server error";
+        next(error)
+    }
+}
+
 const getProductById = async(req, res, next) => {
     try {
         let product = await Product.findById(req.params.id).populate('subCategory').populate('category')
@@ -137,6 +154,7 @@ module.exports = {
     add,
     update,
     getAllProducts,
+    queryProductByName,
     getProductById,
     getProductsByCategoryName,
     getProductsBySubCategoryName,
