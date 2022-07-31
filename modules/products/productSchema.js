@@ -5,9 +5,11 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    photo:{
-        type:String,
-        default:''
+    photos:{
+        type:[{
+            id:String,
+            src:String
+        }],
     },
     category:{
         type:mongoose.Schema.Types.ObjectId,

@@ -6,7 +6,7 @@ const uuid = require('uuid');
 const add = async(req,res,next)=>{
     try{
         let uniqueId = uuid.v4()
-        let product = new Product({...req.body,model:req.body.model !== 'new'?req.body.model:uniqueId})
+        let product = new Product({...req.body,photos:[{id:uuid.v4(),src:req.body.photo}],model:req.body.model !== 'new'?req.body.model:uniqueId})
         let subCategory = await SubCategory.findById(req.body.subCategory)
         let productsArray = subCategory.products
         await product.save()
@@ -33,6 +33,46 @@ const update = async(req,res,next)=>{
         }
         res.send({
             message:'product updated successfully',
+            product
+        })
+    }catch(error){
+        error.status = 404;
+        next(error)
+    }
+}
+
+const addPhoto = async(req,res,next)=>{
+    let id = req.params.id
+    try{
+        let product = await Product.findByIdAndUpdate(
+            id,
+            {$push:{photos: {id:uuid.v4(),src:req.body.photo}}},
+            {new:true}).populate('subCategory').populate('category')
+
+        if(!product){
+            throw new Error('no product found')
+        }
+        res.send({
+            message:'photo added successfully successfully',
+            product
+        })
+    }catch(error){
+        error.status = 404;
+        next(error)
+    }
+}
+
+const removePhoto = async(req,res,next)=>{
+    let id = req.params.id
+    try{
+        let product = await Product.findByIdAndUpdate(id,
+            {$pull:{photos: {id:req.body.id}}},
+            {new:true}).populate('subCategory').populate('category')
+        if(!product){
+            throw new Error('no product found')
+        }
+        res.send({
+            message:'photo removed successfully successfully',
             product
         })
     }catch(error){
@@ -153,6 +193,8 @@ const getProductByModelAndSpecs = async(req, res, next) => {
 module.exports = {
     add,
     update,
+    addPhoto,
+    removePhoto,
     getAllProducts,
     queryProductByName,
     getProductById,
