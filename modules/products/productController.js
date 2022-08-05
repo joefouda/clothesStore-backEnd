@@ -1,22 +1,20 @@
 const Product = require('./productModel')
-const SubCategory = require('../sub categories/subCategoryModel')
+const Model = require('../models/modelModel')
 const Category = require('../categories/categoryModel')
 const uuid = require('uuid');
 
 const add = async(req,res,next)=>{
     try{
-        let uniqueId = uuid.v4()
-        let product = new Product({...req.body,photos:[{id:uuid.v4(),src:req.body.photo}],model:req.body.model !== 'new'?req.body.model:uniqueId})
-        let subCategory = await SubCategory.findById(req.body.subCategory)
-        let productsArray = subCategory.products
+        let product = new Product({...req.body,photos:[{id:uuid.v4(),src:req.body.photo}]})
         await product.save()
-        productsArray.push(product._id)
-        if(req.body.model !== 'new'){
-            await SubCategory.findByIdAndUpdate(req.body.subCategory,{products:productsArray})
-        }else{
-            await SubCategory.findByIdAndUpdate(req.body.subCategory,{products:productsArray,$push: { models: uniqueId }})
-        }
-        res.send('product added successfully')
+        await Model.findByIdAndUpdate(
+            req.body.model,
+            {$push: { products:product._id}}
+        )
+        res.send({
+            message:'product added successfully',
+            product
+        })
     }catch(error){
         error.status = 422;
         next(error)

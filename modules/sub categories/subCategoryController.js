@@ -1,11 +1,9 @@
 const SubCategory = require('./subCategoryModel')
 const Category = require('../categories/categoryModel')
-const Spec = require('../specs/specModel')
 
 const add = async (req, res, next) => {
     try {
-        let subCategory = new SubCategory({photo:req.body.photo, name:req.body.name, category:req.body.category})
-        let specs = req.body.specs
+        let subCategory = new SubCategory(req.body)
         await subCategory.save()
 
         await Category.findOneAndUpdate(
@@ -13,28 +11,10 @@ const add = async (req, res, next) => {
             { $push: { subCategories: subCategory._id } }
         )
 
-        specs.forEach(async (ele,index)=>{
-            let spec = new Spec(ele)
-            await spec.save()
-
-            if(index === specs.length -1){
-                let finalSubCategory = await SubCategory.findByIdAndUpdate(
-                    subCategory._id,
-                    { $push: { specs: spec._id } },
-                    {new:true}
-                ).populate('specs');
-
-                res.send({
-                    message: 'subCategory added successfully',
-                    subCategory:finalSubCategory
-                })
-            }else {
-                await SubCategory.findByIdAndUpdate(
-                    subCategory._id,
-                    { $push: { specs: spec._id } }
-                );
-            }
-        })     
+        res.send({
+            message: 'subCategory added successfully',
+            subCategory
+        })
     } catch (error) {
         error.status = 422;
         next(error)
@@ -44,33 +24,11 @@ const add = async (req, res, next) => {
 const update = async (req, res, next) => {
     let id = req.params.id
     try {
-        let oldSubCategory = await SubCategory.findById(id)
-        oldSubCategory.specs.map(async ele=>{
-            await Spec.findByIdAndRemove(ele)
+        let subCategory = await SubCategory.findByIdAndUpdate(id, {...req.body}, { new: true })
+        res.send({
+            message: 'subCategory updated successfully',
+            subCategory
         })
-        await SubCategory.findByIdAndUpdate(id, {photo:req.body.photo, name:req.body.name, category:req.body.category, specs:[]}, { new: true })
-        let specs = req.body.specs
-        specs.forEach(async (ele, index)=>{
-            let spec = new Spec(ele)
-            await spec.save()
-            if(index === specs.length -1){
-                let finalSubCategory = await SubCategory.findByIdAndUpdate(
-                    id,
-                    { $push: { specs: spec._id } },
-                    {new:true}
-                ).populate('specs');
-                res.send({
-                    message: 'subCategory updated successfully',
-                    subCategory:finalSubCategory
-                })
-            }else {
-                await SubCategory.findByIdAndUpdate(
-                    id,
-                    { $push: { specs: spec._id } }
-                );
-            }
-        })  
-        
     } catch (error) {
         error.status = 404;
         next(error)
@@ -80,9 +38,15 @@ const update = async (req, res, next) => {
 const getSubCategoryById = async (req, res, next) => {
     let id = req.params.id
     try {
-        let subCategory = await SubCategory.findById(id).populate('specs')
+        let subCategory = await SubCategory.findById(id).populate('models').populate({
+            path:'models',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
+        })
         res.send({
-            message:'found',
+            message: 'found',
             subCategory
         })
     } catch (error) {
@@ -94,9 +58,9 @@ const getSubCategoryById = async (req, res, next) => {
 const getSubCategoryByName = async (req, res, next) => {
     let name = req.params.name
     try {
-        let subCategory = await SubCategory.findOne({name}).populate('specs')
+        let subCategory = await SubCategory.findOne({ name })
         res.send({
-            message:'found',
+            message: 'found',
             subCategory
         })
     } catch (error) {

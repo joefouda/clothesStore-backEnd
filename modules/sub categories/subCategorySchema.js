@@ -13,16 +13,9 @@ const subCategotySchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'Category'
     },
-    products:{
-        type:[mongoose.Schema.Types.ObjectId],
-        ref:'Product'
-    },
     models:{
-        type:[String]
-    },
-    specs:{
         type:[mongoose.Schema.Types.ObjectId],
-        ref:'Spec'
+        ref:'Model'
     },
 })
 

@@ -34,13 +34,7 @@ const update = async(req,res,next)=>{
 
 const getAllCategories = async (req, res, next) => {
     try {
-        let categories = await Category.find().populate('subCategories').populate({
-            path: 'subCategories',
-            populate: {
-              path: 'specs',
-              model: 'Spec',
-            }
-          })
+        let categories = await Category.find().populate('subCategories')
         res.send({
             categories
         })
@@ -54,13 +48,7 @@ const getAllCategories = async (req, res, next) => {
 
 const getCategoryById = async (req, res, next) => {
     try {
-        let category = await Category.findById(req.params.id).populate('subCategories').populate({
-            path: 'subCategories',
-            populate: {
-              path: 'specs',
-              model: 'Spec',
-            }
-          })
+        let category = await Category.findById(req.params.id).populate('subCategories')
         res.send({
             category
         })
