@@ -1,6 +1,7 @@
 const Product = require('./productModel')
 const Model = require('../models/modelModel')
 const Category = require('../categories/categoryModel')
+const SubCategory = require('../sub categories/subCategoryModel')
 const uuid = require('uuid');
 
 const add = async(req,res,next)=>{
@@ -81,7 +82,13 @@ const removePhoto = async(req,res,next)=>{
 
 const getAllProducts = async (req, res, next) => {
     try {
-        let products = await Product.find().populate('subCategory').populate('category')
+        let products = await Product.find().populate('subCategory').populate('category').populate({
+            path:'model',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
+        })
         res.send({
             products
         })
@@ -97,7 +104,13 @@ const queryProductByName = async (req, res, next) => {
     try {
         let products = await Product.find({
             name: { $regex: `${req.params.name}`},
-        }).populate('subCategory').populate('category')
+        }).populate('subCategory').populate('category').populate({
+            path:'model',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
+        })
 
         res.send({
             products
@@ -112,7 +125,13 @@ const queryProductByName = async (req, res, next) => {
 
 const getProductById = async(req, res, next) => {
     try {
-        let product = await Product.findById(req.params.id).populate('subCategory').populate('category')
+        let product = await Product.findById(req.params.id).populate('subCategory').populate('category').populate({
+            path:'model',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
+        })
         res.send({
             product
         })
@@ -128,7 +147,13 @@ const getProductsByCategoryName = async(req, res, next) => {
     let products = []
     try {
         const category = await Category.findOne({name:req.params.name})
-        if(category) products = await Product.find({category:category._id}).populate('subCategory').populate('category')
+        if(category) products = await Product.find({category:category._id}).populate('subCategory').populate('category').populate({
+            path:'model',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
+        })
         res.send({
             products
         })
@@ -144,21 +169,13 @@ const getProductsBySubCategoryName = async(req, res, next) => {
     let products = []
     try {
         const subCategory = await SubCategory.findOne({name:req.params.name})
-        if(subCategory) products = await Product.find({subCategory:subCategory._id}).populate('subCategory').populate('category')
-        res.send({
-            products
+        if(subCategory) products = await Product.find({subCategory:subCategory._id}).populate('subCategory').populate('category').populate({
+            path:'model',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
         })
-    }
-    catch (error) {
-        error.status = 500;
-        error.message = "internal server error";
-        next(error)
-    }
-}
-
-const getProductsByModel = async(req, res, next) => {
-    try {
-        let products = await Product.find({model:req.params.model}).populate('subCategory').populate('category')
         res.send({
             products
         })
@@ -172,7 +189,13 @@ const getProductsByModel = async(req, res, next) => {
 
 const getProductByModelAndSpecs = async(req, res, next) => {
     try {
-        let products = await Product.find({model:req.body.model}).populate('subCategory').populate('category')
+        let products = await Product.find({model:req.body.model}).populate('subCategory').populate('category').populate({
+            path:'model',
+            populate:{
+                path:'specs',
+                model:'Spec'
+            }
+        })
         let product = products.find(product=>req.body.specs.every((ele,index)=>{
                 return product.specs[index].value === ele.value
         }))
@@ -198,6 +221,5 @@ module.exports = {
     getProductById,
     getProductsByCategoryName,
     getProductsBySubCategoryName,
-    getProductsByModel,
     getProductByModelAndSpecs
 }
