@@ -1,7 +1,7 @@
 const express = require('express')
 const orderItemRouter = express.Router()
 const {editQuantity} = require('./orderItemController')
-const errorHandler = require('../middlewares')
+const {errorHandler} = require('../middlewares')
 
 
 orderItemRouter.put('/',editQuantity)

@@ -11,7 +11,10 @@ const orderItemSchema = new mongoose.Schema({
         min:[1, 'must be greater than 0'],
         default:1
     },
-    orderPrice:Number
+    orderPrice:{
+        type:Number,
+        required:true
+    }
 })
 
 module.exports = orderItemSchema

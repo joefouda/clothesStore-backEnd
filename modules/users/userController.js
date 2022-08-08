@@ -3,12 +3,10 @@ const Cart = require('../carts/cartModel')
 const bcrypt = require('bcrypt')
 const util = require('util')
 const jwt = require('jsonwebtoken')
-const { response } = require('express')
 const saltRounds = 10;
 
 //make jason web token functions async using util
 const asyncLogInUser = util.promisify(jwt.sign);
-const asyncVerifyUser = util.promisify(jwt.verify);
 const secretKey = process.env.SECRET_KEY
 
 const signUp = async (req, res, next) => {
@@ -79,6 +77,12 @@ const logIn = async (req, res, next) => {
         if (!user) {
             throw new Error('invalid email or password');
         }
+
+        if(user.isBanned === true){
+            res.send({
+                message: 'you have been banned due to bad behavior',
+            })
+        }
         const { password: hashedPassword } = user;
         const checkPassword = await bcrypt.compare(password, hashedPassword);
         if (!checkPassword) {
@@ -101,13 +105,8 @@ const logIn = async (req, res, next) => {
 
 const updateUserInfo = async (req, res, next) => {
     const { name, email, address } = req.body
-    const { authorization } = req.headers
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let id = payload.id
+        let id = req.user
         const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true }).populate('cart').populate('favorites').populate({
             path: 'favorites',
             populate:{
@@ -210,14 +209,10 @@ const changeUserState = async (req, res, next) => {
 }
 
 const addToFavorites = async (req, res, next) => {
-    const { authorization } = req.headers
+    let id = req.user
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let user = await User.findById(payload.id)
-        let responseUser = await User.findById(payload.id).populate('favorites').populate({
+        let user = await User.findById(id)
+        let responseUser = await User.findById(id).populate('favorites').populate({
             path: 'favorites',
             populate:{
                 path:'category',
@@ -233,7 +228,7 @@ const addToFavorites = async (req, res, next) => {
         if (user.favorites.includes(req.body.productId)) res.send({user:responseUser, message: `Product Already exists` })
         else {
             let newUser = await User.findByIdAndUpdate(
-                payload.id,
+                id,
                 { $push: { favorites: req.body.productId } },
                 { new: true }
             ).populate('favorites').populate({
@@ -264,14 +259,10 @@ const addToFavorites = async (req, res, next) => {
 }
 
 const removeFromFavorites = async (req, res, next) => {
-    const { authorization } = req.headers
+    let id = req.user
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
         let newUser = await User.findByIdAndUpdate(
-            payload.id,
+            id,
             { $pull: { favorites: req.body.productId } },
             { new: true }
         ).populate('favorites').populate({
@@ -301,13 +292,9 @@ const removeFromFavorites = async (req, res, next) => {
 }
 
 const getFavorites = async (req, res, next) => {
-    const { authorization } = req.headers
+    let id = req.user
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        const user = await User.findById(payload.id).populate('favorites').populate({
+        const user = await User.findById(id).populate('favorites').populate({
             path: 'favorites',
             populate:{
                 path:'category',

@@ -11,8 +11,11 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMethod:{
         type:String,
+        required:true
     },
-    grandTotal:Number,
+    grandTotal:{
+        type:Number
+    },
     shippingAddress:{
         country:String,
         province:String,

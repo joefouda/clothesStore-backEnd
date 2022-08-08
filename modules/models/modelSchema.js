@@ -7,11 +7,13 @@ const modelSchema = new mongoose.Schema({
     },
     subCategory:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'SubCategory'
+        ref:'SubCategory',
+        required:true
     },
     category:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Category'
+        ref:'Category',
+        required:true
     },
     products:{
         type:[mongoose.Schema.Types.ObjectId],

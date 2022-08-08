@@ -7,7 +7,7 @@ const categorySchema = new mongoose.Schema({
     },
     photo:{
         type:String,
-        default:'test'
+        required:true,
     },
     subCategories:{
         type:[mongoose.Schema.Types.ObjectId],

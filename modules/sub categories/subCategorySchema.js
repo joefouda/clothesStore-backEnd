@@ -7,11 +7,12 @@ const subCategotySchema = new mongoose.Schema({
     },
     photo:{
         type:String,
-        default:''
+        required:true
     },
     category:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Category'
+        ref:'Category',
+        required:true
     },
     models:{
         type:[mongoose.Schema.Types.ObjectId],

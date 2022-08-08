@@ -27,7 +27,10 @@ const productSchema = new mongoose.Schema({
             value:String
         }
     ],
-    description:String,
+    description:{
+        type:String,
+        required:true
+    },
     price:{
         type:Number,
         min: [1, 'must be greater than 0'],
@@ -35,7 +38,8 @@ const productSchema = new mongoose.Schema({
     },
     model:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Model'
+        ref:'Model',
+        required:true
     },
     stock:{
         type:Number,

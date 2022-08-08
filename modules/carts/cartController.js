@@ -1,19 +1,10 @@
 const Cart = require('./cartModel')
 const OrderItem = require('../orderItems/orderItemModel')
 const User = require('../users/userModel')
-const util = require('util')
-const jwt = require('jsonwebtoken')
-const asyncVerifyUser = util.promisify(jwt.verify);
-const secretKey = process.env.SECRET_KEY
 
 const addToCart = async (req, res, next) => {
-    const { authorization } = req.headers
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let user = await User.findById(payload.id)
+        let user = await User.findById(req.user)
         let responseCart = await Cart.findById(user.cart).populate('items').populate({
             path: 'items',
             populate: {
@@ -71,14 +62,8 @@ const addToCart = async (req, res, next) => {
 }
 
 const removeFromCart = async (req, res, next) => {
-    const { authorization } = req.headers
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let user = await User.findById(payload.id)
-
+        let user = await User.findById(req.user)
         await OrderItem.findByIdAndRemove(req.params.id)
         await Cart.findOneAndUpdate(
             { _id: user.cart },
@@ -111,13 +96,8 @@ const removeFromCart = async (req, res, next) => {
 }
 
 const emptyCart = async (req, res, next) => {
-    const { authorization } = req.headers
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let user = await User.findById(payload.id)
+        let user = await User.findById(req.user)
         let cart = await Cart.findById(user.cart)
         await Cart.findOneAndUpdate(
             cart._id,
@@ -133,13 +113,8 @@ const emptyCart = async (req, res, next) => {
 }
 
 const getCart = async (req, res, next) => {
-    const { authorization } = req.headers
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let user = await User.findById(payload.id)
+        let user = await User.findById(req.user)
         let cart = await Cart.findById(user.cart).populate('items').populate({
             path: 'items',
             populate: {

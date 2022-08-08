@@ -7,17 +7,12 @@ const secretKey = process.env.SECRET_KEY
 
 
 const createOrder = async (req, res, next) => {
-    const { authorization } = req.headers
     try {
-        const payload = await asyncVerifyUser(authorization, secretKey)
-        if (!payload) {
-            throw new Error('you have no permission');
-        }
-        let order = new Order({ ...req.body, user: payload.id })
+        let order = new Order({ ...req.body, user: req.user })
         await order.save()
 
         let newUser = await User.findByIdAndUpdate(
-            payload.id,
+            req.user,
             { $push: { orders: order._id } },
             { new: true }).populate('orders').populate({
                 path:'orders',
@@ -68,7 +63,6 @@ const createOrder = async (req, res, next) => {
 }
 
 const getAllOrders = async (req, res, next) => {
-    const { authorization } = req.headers
     try {
         const orders = await Order.find().populate({
             path: 'orderItems',

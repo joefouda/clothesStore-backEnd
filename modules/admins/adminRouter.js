@@ -3,7 +3,7 @@ const adminRouter = express.Router();
 
 const { logIn } = require('./adminController')
 const { signUp } = require('./adminController')
-const errorHandler = require('../middlewares')
+const {errorHandler} = require('../middlewares')
 
 adminRouter.post('/signup', signUp)
 adminRouter.post('/login', logIn)

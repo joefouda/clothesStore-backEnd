@@ -6,5 +6,10 @@ const reviewSchema = new mongoose.Schema({
         required:true,
         default:0
     },
-    description:String
+    description:{
+        type:String,
+        required:true
+    }
 })
+
+module.exports = reviewSchema

@@ -1,8 +1,7 @@
 const express = require('express')
 const otherRouter = express.Router()
 const {add, getMainSliderPhotos, deletePhoto} = require('./otherController')
-const {restrictToAdmin} = require('../auth')
-const errorHandler = require('../middlewares')
+const {errorHandler, restrictToAdmin} = require('../middlewares')
 
 otherRouter.put('/:name',restrictToAdmin,add)
 otherRouter.delete('/:name/:id',restrictToAdmin,deletePhoto)

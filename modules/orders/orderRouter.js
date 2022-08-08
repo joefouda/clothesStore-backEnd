@@ -1,10 +1,9 @@
 const express = require('express')
 const orderRouter = express.Router()
-const {restrictToAdmin} = require('../auth')
 const { createOrder, getAllOrders, changeOrderState } = require('./orderController')
-const errorHandler = require('../middlewares')
+const {errorHandler, restrictToAdmin, restrictToUser} = require('../middlewares')
 
-orderRouter.post('/',createOrder)
+orderRouter.post('/', restrictToUser, createOrder)
 orderRouter.get('/',restrictToAdmin,getAllOrders)
 orderRouter.put('/',restrictToAdmin,changeOrderState)
 orderRouter.use(errorHandler)
