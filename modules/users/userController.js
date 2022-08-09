@@ -17,7 +17,9 @@ const signUp = async (req, res, next) => {
         user.password = await bcrypt.hash(user.password, saltRounds)
         user.cart = cart._id
         await user.save();
-        res.send("signed up successfully");
+        res.send({
+            message: 'signed up successfully',
+        });
     } catch (error) {
         error.status = 500;
         next(error);
@@ -99,6 +101,68 @@ const logIn = async (req, res, next) => {
     }
     catch (error) {
         error.status = 422;
+        next(error)
+    }
+}
+
+const getUserById = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user).populate('cart').populate('favorites').populate({
+            path: 'favorites',
+            populate:{
+                path:'category',
+                model:'Category'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'subCategory',
+                model:'SubCategory'
+            }    
+        }).populate('orders').populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'category',
+                        model:'Category'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'subCategory',
+                        model:'SubCategory'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'user',
+                model:'User',
+            }
+        })
+        if (!user) {
+            throw new Error('User not found');
+        }
+        res.send({
+            user
+        })
+    }
+    catch (error) {
+        error.status = 404;
         next(error)
     }
 }
@@ -321,6 +385,7 @@ const getFavorites = async (req, res, next) => {
 module.exports = {
     logIn,
     signUp,
+    getUserById,
     updateUserInfo,
     getAllUsers,
     getUsersByName,

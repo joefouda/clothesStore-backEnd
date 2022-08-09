@@ -30,6 +30,9 @@ const orderSchema = new mongoose.Schema({
     dateOrdered:{
         type:Date,
         default:new Date
+    },
+    arrivingDate:{
+        type:Date,
     }
 })
 
