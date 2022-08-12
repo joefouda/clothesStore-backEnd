@@ -47,6 +47,10 @@ const productSchema = new mongoose.Schema({
         min: [0, 'must be equal to or greater than 0'],
         default:0
     },
+    netPrice:{
+        type:Number,
+        min: [0, 'must be greater than 0'],
+    },
     model:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Model',
