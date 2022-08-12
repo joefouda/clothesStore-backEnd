@@ -36,6 +36,17 @@ const productSchema = new mongoose.Schema({
         min: [1, 'must be greater than 0'],
         default:1
     },
+    discountPercentage:{
+        type:Number,
+        min: [0, 'must be equal to or greater than 0'],
+        max: [99, 'must be less than 100'],
+        default:0
+    },
+    discountValue: {
+        type:Number,
+        min: [0, 'must be equal to or greater than 0'],
+        default:0
+    },
     model:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Model',

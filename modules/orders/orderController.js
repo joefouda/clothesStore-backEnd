@@ -1,5 +1,6 @@
 const Order = require('./orderModel')
 const User = require('../users/userModel')
+const Product = require('../products/productModel')
 
 const createOrder = async (req, res, next) => {
     try {
@@ -12,6 +13,13 @@ const createOrder = async (req, res, next) => {
             order._id,
             {arrivingDate:arrivingDate}
         )
+
+        req.body.orderItems.map(async orderItem=>{
+            await Product.findByIdAndUpdate(
+                orderItem.product._id,
+                { $inc :{stock : -orderItem.quantity}}
+            )
+        })
 
         let newUser = await User.findByIdAndUpdate(
             req.user,
@@ -112,7 +120,19 @@ const changeOrderState = async (req, res, next) => {
 
 const cancelOrder = async (req, res, next) => {
     try {
-        await Order.findByIdAndUpdate(req.params.id, { state: 'canceled' })
+        let order = await Order.findByIdAndUpdate(req.params.id, { state: 'canceled' }).populate({
+            path: 'orderItems',
+            populate: {
+                path: 'product',
+                model: 'Product'
+            },
+        })
+        order.orderItems.map(async orderItem=>{
+            await Product.findByIdAndUpdate(
+                orderItem.product._id,
+                { $inc :{stock : orderItem.quantity}}
+            )
+        })
         let user = await User.findById(req.user).populate('orders').populate({
             path: 'orders',
             populate: {

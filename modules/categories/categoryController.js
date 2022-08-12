@@ -7,7 +7,10 @@ const add = async(req,res,next)=>{
             throw new Error('invalid data')
         }
         await category.save()
-        res.send('category added successfully')
+        res.send({
+            message:'category added successfully',
+            category
+        })
     }catch(error){
         error.status = 422;
         next(error)
@@ -17,11 +20,10 @@ const add = async(req,res,next)=>{
 const update = async(req,res,next)=>{
     let data = req.body
     try{
-        let category = await Category.findByIdAndUpdate(req.params.id,data,{new:true})
+        let category = await Category.findByIdAndUpdate(req.params.id,data,{new:true}).populate('subCategories')
         if(!category){
             throw new Error('no category found')
         }
-        await category.save()
         res.send({
             message:'category updated successfully',
             category
