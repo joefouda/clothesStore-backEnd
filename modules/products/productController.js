@@ -7,7 +7,7 @@ const uuid = require('uuid');
 const add = async(req,res,next)=>{
     try{
         let discountValue = Math.floor((req.body.discountPercentage / 100) * req.body.price)
-        let netPrice = discountValue - req.body.price
+        let netPrice = req.body.price - discountValue
         let product = new Product({...req.body, discountValue, netPrice, photos:[{id:uuid.v4(), src:req.body.photo}]})
         await product.save()
         await Model.findByIdAndUpdate(
@@ -29,7 +29,7 @@ const update = async(req,res,next)=>{
     let data = req.body
     try{
         let discountValue = Math.floor((req.body.discountPercentage / 100) * req.body.price)
-        let netPrice = discountValue - req.body.price
+        let netPrice = req.body.price - discountValue
         let product = await Product.findByIdAndUpdate(id,{...data, discountValue, netPrice},{new:true}).populate('subCategory').populate('category')
         if(!product){
             throw new Error('no product found')
