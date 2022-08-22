@@ -20,7 +20,7 @@ const add = async(req,res,next)=>{
 const update = async(req,res,next)=>{
     let data = req.body
     try{
-        let category = await Category.findByIdAndUpdate(req.params.id,data,{new:true}).populate('subCategories')
+        let category = await Category.findByIdAndUpdate(req.params.id,data,{new:true})
         if(!category){
             throw new Error('no category found')
         }
@@ -36,7 +36,7 @@ const update = async(req,res,next)=>{
 
 const getAllCategories = async (req, res, next) => {
     try {
-        let categories = await Category.find().populate('subCategories')
+        let categories = await Category.find()
         res.send({
             categories
         })
@@ -50,7 +50,7 @@ const getAllCategories = async (req, res, next) => {
 
 const getCategoryById = async (req, res, next) => {
     try {
-        let category = await Category.findById(req.params.id).populate('subCategories')
+        let category = await Category.findById(req.params.id)
         res.send({
             category
         })

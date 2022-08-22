@@ -15,13 +15,9 @@ const modelSchema = new mongoose.Schema({
         ref:'Category',
         required:true
     },
-    products:{
-        type:[mongoose.Schema.Types.ObjectId],
-        ref:'Product'
-    },
-    specs :{
-        type:[mongoose.Schema.Types.ObjectId],
-        ref:'Spec'
+    variants :{
+        colors:Array,
+        sizes:Array
     }
 })
 

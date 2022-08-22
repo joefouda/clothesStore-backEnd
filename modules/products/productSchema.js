@@ -21,12 +21,10 @@ const productSchema = new mongoose.Schema({
         ref:'SubCategory',
         required:true
     },
-    specs:[
-        {
-            name:String,
-            value:String
-        }
-    ],
+    variants:{
+        color:String,
+        size:String
+    },
     description:{
         type:String,
         required:true

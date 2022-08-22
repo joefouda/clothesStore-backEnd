@@ -1,6 +1,7 @@
 const Order = require('./orderModel')
 const User = require('../users/userModel')
 const Product = require('../products/productModel')
+const OrderItem = require('../orderItems/orderItemModel')
 
 const createOrder = async (req, res, next) => {
     try {
@@ -183,9 +184,36 @@ const cancelOrder = async (req, res, next) => {
     }
 }
 
+const getOrdersTotal = async(req, res, next) => {
+    let orders = await Order.find({})
+    let ordersTotal = orders.reduce((total, st)=> {
+        return total + st.grandTotal
+    }, 0)
+    res.send({
+        message: "orders total",
+        ordersTotal
+    })
+}
+
+const getMostSoldItem = async(req, res, next) => {
+    let orders = await OrderItem.aggregate([
+        {
+            $group: {_id: '$product', totalOrders:{$sum:'$quantity'}}
+        }
+    ])
+
+    let mostSold = orders.sort((a,b)=>a.quantity-b.quantity)[0]
+    res.send({
+        message: "most ordered product",
+        mostSold
+    })
+}
+
 module.exports = {
     createOrder,
     getAllOrders,
     changeOrderState,
-    cancelOrder
+    cancelOrder,
+    getOrdersTotal,
+    getMostSoldItem
 }

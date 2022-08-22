@@ -171,7 +171,7 @@ const updateUserInfo = async (req, res, next) => {
     const { name, email, address } = req.body
     try {
         let id = req.user
-        const user = await User.findOneAndUpdate(id, { name: name, email: email, address: address }, { new: true }).populate('cart').populate('favorites').populate({
+        const user = await User.findOneAndUpdate({_id:id}, { name: name, email: email, address: address }, { new: true }).populate('cart').populate('favorites').populate({
             path: 'favorites',
             populate:{
                 path:'category',
@@ -260,7 +260,7 @@ const getUsersByName = async (req, res, next) => {
 const changeUserState = async (req, res, next) => {
     try {
         let user = await User.findById(req.params.id)
-        await User.findByIdAndUpdate(req.params.id, { isBanned: user.isBanned ? false : true })
+        await User.findByIdAndUpdate(req.params.id, { isBanned: !user.isBanned })
         res.send({
             message: `User ${user.isBanned ? 'activated successfully' : 'Banned Successfully'}`
         })

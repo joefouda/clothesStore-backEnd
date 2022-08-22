@@ -8,10 +8,6 @@ const categorySchema = new mongoose.Schema({
     photo:{
         type:String,
         required:true,
-    },
-    subCategories:{
-        type:[mongoose.Schema.Types.ObjectId],
-        ref:'SubCategory'
     }
 })
 

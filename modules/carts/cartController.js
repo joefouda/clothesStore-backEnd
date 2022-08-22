@@ -100,7 +100,7 @@ const emptyCart = async (req, res, next) => {
         let user = await User.findById(req.user)
         let cart = await Cart.findById(user.cart)
         await Cart.findOneAndUpdate(
-            cart._id,
+            {_id:cart._id},
             { items: [] }
         );
 

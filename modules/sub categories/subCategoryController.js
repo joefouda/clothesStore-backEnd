@@ -6,11 +6,6 @@ const add = async (req, res, next) => {
         let subCategory = new SubCategory(req.body)
         await subCategory.save()
 
-        await Category.findOneAndUpdate(
-            { _id: req.body.category },
-            { $push: { subCategories: subCategory._id } }
-        )
-
         res.send({
             message: 'subCategory added successfully',
             subCategory
@@ -69,9 +64,23 @@ const getSubCategoryByName = async (req, res, next) => {
     }
 }
 
+const getSubCategoriesByCategoryId = async (req, res, next) => {
+    let id = req.params.id
+    try {
+        let subCategories = await SubCategory.find({ category : id})
+        res.send({
+            subCategories
+        })
+    } catch (error) {
+        error.status = 404;
+        next(error)
+    }
+}
+
 module.exports = {
     add,
     update,
     getSubCategoryById,
-    getSubCategoryByName
+    getSubCategoryByName,
+    getSubCategoriesByCategoryId
 }
