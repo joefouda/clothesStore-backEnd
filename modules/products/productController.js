@@ -201,6 +201,37 @@ const getProductByModelAndVariants = async(req, res, next) => {
     }
 }
 
+const setSpecialCategory = async(req, res, next) => {
+    try {
+        let product = await Product.findByIdAndUpdate(
+            req.body.id,
+            {specialCategory:req.body.specialCategory},
+            {new:true}
+        )
+
+        res.send({
+            product
+        })
+    }
+    catch (error) {
+        error.status = 404;
+        next(error)
+    }
+}
+
+const getProductsBySpecialCategories = async(req, res, next) => {
+    try {
+        let products = await Product.find({specialCategory:req.params.specialCategory}).populate('subCategory').populate('category').populate('model')
+        res.send({
+            products
+        })
+    }
+    catch (error) {
+        error.status = 404;
+        next(error)
+    }
+}
+
 module.exports = {
     add,
     update,
@@ -212,5 +243,7 @@ module.exports = {
     getProductsByCategoryName,
     getProductsBySubCategoryName,
     getProductByModelAndVariants,
-    getProductsByModelId
+    getProductsByModelId,
+    setSpecialCategory,
+    getProductsBySpecialCategories
 }

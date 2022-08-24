@@ -1,6 +1,20 @@
 const express = require('express')
 const productRouter = express.Router()
-const {add, update,addPhoto, removePhoto, getAllProducts, queryProductByName, getProductsByCategoryName,getProductsBySubCategoryName, getProductById, getProductsByModelId, getProductByModelAndVariants} = require('./productController')
+const {
+    add,
+    update,
+    addPhoto,
+    removePhoto,
+    getAllProducts,
+    queryProductByName,
+    getProductsByCategoryName,
+    getProductsBySubCategoryName,
+    getProductById,
+    getProductsByModelId,
+    getProductByModelAndVariants,
+    setSpecialCategory,
+    getProductsBySpecialCategories
+} = require('./productController')
 const {errorHandler, restrictToAdmin} = require('../middlewares')
 
 productRouter.post('/add',restrictToAdmin,add)
@@ -14,6 +28,8 @@ productRouter.get('/category/:name',getProductsByCategoryName)
 productRouter.get('/subCategory/:name',getProductsBySubCategoryName)
 productRouter.get('/model/:id',getProductsByModelId)
 productRouter.put('/variants',getProductByModelAndVariants)
+productRouter.put('/specialCategory',restrictToAdmin,setSpecialCategory)
+productRouter.get('/specialCategory/:specialCategory',getProductsBySpecialCategories)
 
 
 productRouter.use(errorHandler)

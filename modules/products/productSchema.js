@@ -59,6 +59,10 @@ const productSchema = new mongoose.Schema({
         min: [0, 'must be greater than or equal to 0'],
         default:0
     },
+    specialCategory:{
+        type:String,
+        default:'regular'
+    },
     reviews:{
         type:[mongoose.Schema.Types.ObjectId],
         ref:'Review'
