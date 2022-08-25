@@ -30,12 +30,26 @@ const deletePhoto = async(req,res,next)=>{
     }
 }
 
-const getMainSliderPhotos = async(req,res,next)=>{
+const getSpecialDocument = async(req,res,next)=>{
     try{
-        let mainSlider = await Other.findOne(
+        let result = await Other.findOne(
             { name:req.params.name },
         );
-        res.send({mainSlider})
+        res.send({result})
+    }catch(error){
+        error.status = 422;
+        next(error)
+    }
+}
+
+const addMainListPhoto = async(req,res,next)=>{
+    try{
+        let result = await Other.findOneAndUpdate(
+            { name:req.params.name, 'MainLists.title':req.body.title },
+            { 'MainLists.$.photo':req.body.photo },
+            { new:true }
+        );
+        res.send({result})
     }catch(error){
         error.status = 422;
         next(error)
@@ -44,6 +58,7 @@ const getMainSliderPhotos = async(req,res,next)=>{
 
 module.exports = {
     add,
-    getMainSliderPhotos,
-    deletePhoto
+    getSpecialDocument,
+    deletePhoto,
+    addMainListPhoto
 }
