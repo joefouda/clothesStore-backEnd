@@ -201,11 +201,11 @@ const getProductByModelAndVariants = async(req, res, next) => {
     }
 }
 
-const setSpecialCategory = async(req, res, next) => {
+const setMainList = async(req, res, next) => {
     try {
         let product = await Product.findByIdAndUpdate(
             req.body.id,
-            {specialCategory:req.body.specialCategory},
+            {mainList:req.body.mainList},
             {new:true}
         )
 
@@ -219,9 +219,9 @@ const setSpecialCategory = async(req, res, next) => {
     }
 }
 
-const getProductsBySpecialCategories = async(req, res, next) => {
+const getProductsByMainList = async(req, res, next) => {
     try {
-        let products = await Product.find({specialCategory:req.params.specialCategory}).populate('subCategory').populate('category').populate('model')
+        let products = await Product.find({mainList:req.params.mainList}).populate('subCategory').populate('category').populate('model')
         res.send({
             products
         })
@@ -244,6 +244,6 @@ module.exports = {
     getProductsBySubCategoryName,
     getProductByModelAndVariants,
     getProductsByModelId,
-    setSpecialCategory,
-    getProductsBySpecialCategories
+    setMainList,
+    getProductsByMainList
 }

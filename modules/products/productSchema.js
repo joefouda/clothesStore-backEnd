@@ -59,7 +59,7 @@ const productSchema = new mongoose.Schema({
         min: [0, 'must be greater than or equal to 0'],
         default:0
     },
-    specialCategory:{
+    mainList:{
         type:String,
         default:'regular'
     },

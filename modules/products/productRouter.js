@@ -12,8 +12,8 @@ const {
     getProductById,
     getProductsByModelId,
     getProductByModelAndVariants,
-    setSpecialCategory,
-    getProductsBySpecialCategories
+    setMainList,
+    getProductsByMainList
 } = require('./productController')
 const {errorHandler, restrictToAdmin} = require('../middlewares')
 
@@ -28,8 +28,8 @@ productRouter.get('/category/:name',getProductsByCategoryName)
 productRouter.get('/subCategory/:name',getProductsBySubCategoryName)
 productRouter.get('/model/:id',getProductsByModelId)
 productRouter.put('/variants',getProductByModelAndVariants)
-productRouter.put('/specialCategory',restrictToAdmin,setSpecialCategory)
-productRouter.get('/specialCategory/:specialCategory',getProductsBySpecialCategories)
+productRouter.put('/mainList',restrictToAdmin,setMainList)
+productRouter.get('/mainList/:mainList',getProductsByMainList)
 
 
 productRouter.use(errorHandler)

@@ -5,14 +5,6 @@ const otherSchema = new mongoose.Schema({
     photos:{
         type:[{id:String,src:String}],
     },
-    MainLists: {
-        type:[
-            {
-                photo:String,
-                title:String
-            }
-        ]
-    }
 })
 
 module.exports = otherSchema
