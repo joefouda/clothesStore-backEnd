@@ -5,12 +5,6 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    photos:{
-        type:[{
-            id:String,
-            src:String
-        }],
-    },
     category:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Category',
@@ -20,10 +14,6 @@ const productSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'SubCategory',
         required:true
-    },
-    variants:{
-        color:String,
-        size:String
     },
     description:{
         type:String,
@@ -48,16 +38,6 @@ const productSchema = new mongoose.Schema({
     netPrice:{
         type:Number,
         min: [0, 'must be greater than 0'],
-    },
-    model:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Model',
-        required:true
-    },
-    stock:{
-        type:Number,
-        min: [0, 'must be greater than or equal to 0'],
-        default:0
     },
     mainList:{
         type:String,

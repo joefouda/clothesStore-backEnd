@@ -1,19 +1,83 @@
 const Product = require('./productModel')
-const Model = require('../models/modelModel')
 const Category = require('../categories/categoryModel')
 const SubCategory = require('../sub categories/subCategoryModel')
 const mongoose = require('mongoose')
 const uuid = require('uuid');
+const Inventory = require('../Inventory/InventoryModel')
 
 const add = async(req,res,next)=>{
     try{
         let discountValue = Math.floor((req.body.discountPercentage / 100) * req.body.price)
         let netPrice = req.body.price - discountValue
-        let product = new Product({...req.body, discountValue, netPrice, photos:[{id:uuid.v4(), src:req.body.photo}]})
+        let product = new Product({...req.body, discountValue, netPrice})
         await product.save()
         res.send({
             message:'product added successfully',
             product
+        })
+    }catch(error){
+        error.status = 422;
+        next(error)
+    }
+}
+
+const addColor = async(req,res,next)=>{
+    try{
+        let color = new Inventory({...req.body})
+
+        await color.save()
+
+        res.send({
+            message:'color added successfully',
+            color
+        })
+    }catch(error){
+        error.status = 422;
+        next(error)
+    }
+}
+
+const updateColor = async(req,res,next)=>{
+    try{
+        let color = await Inventory.findByIdAndUpdate(
+            req.params.id,
+            {
+                ...req.body
+            },
+            {new:true}
+        )
+
+        res.send({
+            message:'color updated successfully',
+            color
+        })
+    }catch(error){
+        error.status = 422;
+        next(error)
+    }
+}
+
+const getColorsByProductId = async(req,res,next)=>{
+    try{
+        let colors = await Inventory.find(
+            {productId:req.params.id}
+        )
+
+        res.send({
+            colors
+        })
+    }catch(error){
+        error.status = 422;
+        next(error)
+    }
+}
+
+const getColorById = async(req,res,next)=>{
+    try{
+        let color = await Inventory.findById(req.params.id)
+
+        res.send({
+            color
         })
     }catch(error){
         error.status = 422;
@@ -44,17 +108,14 @@ const update = async(req,res,next)=>{
 const addPhoto = async(req,res,next)=>{
     let id = req.params.id
     try{
-        let product = await Product.findByIdAndUpdate(
+        let inventory = await Inventory.findByIdAndUpdate(
             id,
-            {$push:{photos: {id:uuid.v4(),src:req.body.photo}}},
-            {new:true}).populate('subCategory').populate('category')
+            {$push:{photos: {src:req.body.photo}}},
+            {new:true})
 
-        if(!product){
-            throw new Error('no product found')
-        }
         res.send({
             message:'photo added successfully successfully',
-            product
+            inventory
         })
     }catch(error){
         error.status = 404;
@@ -65,15 +126,13 @@ const addPhoto = async(req,res,next)=>{
 const removePhoto = async(req,res,next)=>{
     let id = req.params.id
     try{
-        let product = await Product.findByIdAndUpdate(id,
+        let inventory = await Inventory.findByIdAndUpdate(id,
             {$pull:{photos: {id:req.body.id}}},
-            {new:true}).populate('subCategory').populate('category')
-        if(!product){
-            throw new Error('no product found')
-        }
+            {new:true})
+
         res.send({
             message:'photo removed successfully successfully',
-            product
+            inventory
         })
     }catch(error){
         error.status = 404;
@@ -158,19 +217,17 @@ const getProductsBySubCategoryName = async(req, res, next) => {
     }
 }
 
-const getProductsByModelId = async(req, res, next) => {
-    let id = req.params.id
+const getProductsBySubCategoryId = async(req, res, next) => {
+    let products = []
     try {
-        let model = await Model.findById(id)
-        let products = await Product.find({model : id})
-        if(!products) res.send({message:'not found'})
+        products = await Product.find({subCategory:req.params.id}).populate('subCategory').populate('category')
         res.send({
-            products,
-            model
+            products
         })
     }
     catch (error) {
-        error.status = 404;
+        error.status = 500;
+        error.message = "internal server error";
         next(error)
     }
 }
@@ -236,14 +293,18 @@ module.exports = {
     add,
     update,
     addPhoto,
+    addColor,
+    updateColor,
+    getColorsByProductId,
+    getColorById,
     removePhoto,
     getAllProducts,
     queryProductByName,
     getProductById,
     getProductsByCategoryName,
+    getProductsBySubCategoryId,
     getProductsBySubCategoryName,
     getProductByModelAndVariants,
-    getProductsByModelId,
     setMainList,
     getProductsByMainList
 }

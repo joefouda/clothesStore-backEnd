@@ -33,13 +33,7 @@ const update = async (req, res, next) => {
 const getSubCategoryById = async (req, res, next) => {
     let id = req.params.id
     try {
-        let subCategory = await SubCategory.findById(id).populate('models').populate({
-            path:'models',
-            populate:{
-                path:'specs',
-                model:'Spec'
-            }
-        })
+        let subCategory = await SubCategory.findById(id)
         res.send({
             message: 'found',
             subCategory
