@@ -108,14 +108,14 @@ const update = async(req,res,next)=>{
 const addPhoto = async(req,res,next)=>{
     let id = req.params.id
     try{
-        let inventory = await Inventory.findByIdAndUpdate(
+        let color = await Inventory.findByIdAndUpdate(
             id,
             {$push:{photos: {src:req.body.photo}}},
             {new:true})
 
         res.send({
             message:'photo added successfully successfully',
-            inventory
+            color
         })
     }catch(error){
         error.status = 404;
@@ -126,13 +126,13 @@ const addPhoto = async(req,res,next)=>{
 const removePhoto = async(req,res,next)=>{
     let id = req.params.id
     try{
-        let inventory = await Inventory.findByIdAndUpdate(id,
-            {$pull:{photos: {id:req.body.id}}},
+        let color = await Inventory.findByIdAndUpdate(id,
+            {$pull:{photos: {_id:req.body.photoId}}},
             {new:true})
 
         res.send({
             message:'photo removed successfully successfully',
-            inventory
+            color
         })
     }catch(error){
         error.status = 404;
