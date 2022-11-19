@@ -15,6 +15,10 @@ const productSchema = new mongoose.Schema({
         ref:'SubCategory',
         required:true
     },
+    colors:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref:'Inventory',
+    },
     description:{
         type:String,
         required:true

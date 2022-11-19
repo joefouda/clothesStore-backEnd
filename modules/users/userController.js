@@ -41,6 +41,12 @@ const logIn = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'colors',
+                model:'Inventory'
+            }    
         }).populate('orders').populate({
             path:'orders',
             populate:{
@@ -66,6 +72,20 @@ const logIn = async (req, res, next) => {
                     populate:{
                         path:'subCategory',
                         model:'SubCategory'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'colors',
+                        model:'Inventory'
                     }
                 }
             }
@@ -119,6 +139,12 @@ const getUserById = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'colors',
+                model:'Inventory'
+            }    
         }).populate('orders').populate({
             path:'orders',
             populate:{
@@ -144,6 +170,20 @@ const getUserById = async (req, res, next) => {
                     populate:{
                         path:'subCategory',
                         model:'SubCategory'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'colors',
+                        model:'Inventory'
                     }
                 }
             }
@@ -183,6 +223,12 @@ const updateUserInfo = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'colors',
+                model:'Inventory'
+            }    
         }).populate('orders').populate({
             path:'orders',
             populate:{
@@ -208,6 +254,20 @@ const updateUserInfo = async (req, res, next) => {
                     populate:{
                         path:'subCategory',
                         model:'SubCategory'
+                    }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'product',
+                    model:'Product',
+                    populate:{
+                        path:'colors',
+                        model:'Inventory'
                     }
                 }
             }
@@ -288,6 +348,12 @@ const addToFavorites = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'colors',
+                model:'Inventory'
+            }    
         });
         if (user.favorites.includes(req.body.productId)) res.send({user:responseUser, message: `Product Already exists` })
         else {
@@ -306,6 +372,12 @@ const addToFavorites = async (req, res, next) => {
                 populate:{
                     path:'subCategory',
                     model:'SubCategory'
+                }    
+            }).populate({
+                path: 'favorites',
+                populate:{
+                    path:'colors',
+                    model:'Inventory'
                 }    
             });
 
@@ -341,6 +413,12 @@ const removeFromFavorites = async (req, res, next) => {
                 path:'subCategory',
                 model:'SubCategory'
             }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'colors',
+                model:'Inventory'
+            }    
         });
 
         res.send({
@@ -369,6 +447,12 @@ const getFavorites = async (req, res, next) => {
             populate:{
                 path:'subCategory',
                 model:'SubCategory'
+            }    
+        }).populate({
+            path: 'favorites',
+            populate:{
+                path:'colors',
+                model:'Inventory'
             }    
         });
         res.send({

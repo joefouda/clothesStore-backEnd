@@ -1,8 +1,8 @@
 const Product = require('./productModel')
 const Category = require('../categories/categoryModel')
 const SubCategory = require('../sub categories/subCategoryModel')
-const mongoose = require('mongoose')
-const uuid = require('uuid');
+// const mongoose = require('mongoose')
+// const uuid = require('uuid');
 const Inventory = require('../Inventory/InventoryModel')
 
 const add = async(req,res,next)=>{
@@ -26,7 +26,10 @@ const addColor = async(req,res,next)=>{
         let color = new Inventory({...req.body})
 
         await color.save()
-
+        await Product.findByIdAndUpdate(
+            req.body.productId,
+            {$push: {colors: color._id}}
+        )
         res.send({
             message:'color added successfully',
             color
@@ -142,7 +145,7 @@ const removePhoto = async(req,res,next)=>{
 
 const getAllProducts = async (req, res, next) => {
     try {
-        let products = await Product.find().populate('subCategory').populate('category').populate('model')
+        let products = await Product.find().populate('subCategory').populate('category').populate('colors')
         res.send({
             products
         })
@@ -158,7 +161,12 @@ const queryProductByName = async (req, res, next) => {
     try {
         let products = await Product.find({
             name: { $regex: `${req.params.name}`},
-        }).populate('subCategory').populate('category').populate('model')
+        }).populate('subCategory').populate('category').populate('colors')
+        
+        // for(let i = 0; i < products.length;i++) {
+        //     let color = await Inventory.findOne({productId:products[i]._id})
+        //     products[i] = {...products[i], color}
+        // }
 
         res.send({
             products
@@ -173,7 +181,7 @@ const queryProductByName = async (req, res, next) => {
 
 const getProductById = async(req, res, next) => {
     try {
-        let product = await Product.findById(req.params.id).populate('subCategory').populate('category').populate('model')
+        let product = await Product.findById(req.params.id).populate('subCategory').populate('category').populate('colors')
         res.send({
             product
         })
@@ -189,7 +197,13 @@ const getProductsByCategoryName = async(req, res, next) => {
     let products = []
     try {
         const category = await Category.findOne({name:req.params.name})
-        if(category) products = await Product.find({category:category._id}).populate('subCategory').populate('category').populate('model')
+        if(category){
+            products = await Product.find({category:category._id}).populate('subCategory').populate('category').populate('colors')
+            // for(let i = 0; i < products.length;i++) {
+            //     let color = await Inventory.findOne({productId:products[i]._id})
+            //     products[i] = {...products[i], color}
+            // }
+        } 
         res.send({
             products
         })
@@ -205,7 +219,13 @@ const getProductsBySubCategoryName = async(req, res, next) => {
     let products = []
     try {
         const subCategory = await SubCategory.findOne({name:req.params.name})
-        if(subCategory) products = await Product.find({subCategory:subCategory._id}).populate('subCategory').populate('category').populate('model')
+        if(subCategory){
+            products = await Product.find({subCategory:subCategory._id}).populate('subCategory').populate('category').populate('colors')
+            // for(let i = 0; i < products.length;i++) {
+            //     let color = await Inventory.findOne({productId:products[i]._id})
+            //     products[i] = {...products[i], color}
+            // }
+        }
         res.send({
             products
         })
@@ -232,31 +252,31 @@ const getProductsBySubCategoryId = async(req, res, next) => {
     }
 }
 
-const getProductByModelAndVariants = async(req, res, next) => {
-    try {
-        let products = await Product.aggregate([
-            {
-                $match: { model: mongoose.Types.ObjectId(req.body.model)}
-            },
-            {
-                $match: {$and: [
-                    {'variants.color': req.body.query.color },
-                    { 'variants.size': req.body.query.size }
-                ]} 
-            }
-        ])
-        if(products.length === 0) {
-            throw new Error('not found')
-        }
-        res.send({
-            product:products[0]
-        })
-    }
-    catch (error) {
-        error.status = 404;
-        next(error)
-    }
-}
+// const getProductByModelAndVariants = async(req, res, next) => {
+//     try {
+//         let products = await Product.aggregate([
+//             {
+//                 $match: { model: mongoose.Types.ObjectId(req.body.model)}
+//             },
+//             {
+//                 $match: {$and: [
+//                     {'variants.color': req.body.query.color },
+//                     { 'variants.size': req.body.query.size }
+//                 ]} 
+//             }
+//         ])
+//         if(products.length === 0) {
+//             throw new Error('not found')
+//         }
+//         res.send({
+//             product:products[0]
+//         })
+//     }
+//     catch (error) {
+//         error.status = 404;
+//         next(error)
+//     }
+// }
 
 const setMainList = async(req, res, next) => {
     try {
@@ -278,9 +298,14 @@ const setMainList = async(req, res, next) => {
 
 const getProductsByMainList = async(req, res, next) => {
     try {
-        let products = await Product.find({mainList:req.params.mainList}).populate('subCategory').populate('category').populate('model')
+        let products = await Product.find({mainList:req.params.mainList}).populate('subCategory').populate('category').populate('colors')
+
+        // for(let i = 0; i < products.length;i++) {
+        //     let color = await Inventory.findOne({productId:products[i]._id})
+        //     products[i] = {...products[i], color}
+        // }
         res.send({
-            products
+            products,
         })
     }
     catch (error) {
@@ -304,7 +329,7 @@ module.exports = {
     getProductsByCategoryName,
     getProductsBySubCategoryId,
     getProductsBySubCategoryName,
-    getProductByModelAndVariants,
+    // getProductByModelAndVariants,
     setMainList,
     getProductsByMainList
 }

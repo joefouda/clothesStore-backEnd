@@ -15,7 +15,7 @@ const {
     getProductsBySubCategoryId,
     getProductsBySubCategoryName,
     getProductById,
-    getProductByModelAndVariants,
+    // getProductByModelAndVariants,
     setMainList,
     getProductsByMainList
 } = require('./productController')
@@ -35,7 +35,7 @@ productRouter.get('/search/:name',queryProductByName)
 productRouter.get('/category/:name',getProductsByCategoryName)
 productRouter.get('/subCategory/:name',getProductsBySubCategoryName)
 productRouter.get('/subCategoryId/:id',getProductsBySubCategoryId)
-productRouter.put('/variants',getProductByModelAndVariants)
+// productRouter.put('/variants',getProductByModelAndVariants)
 productRouter.put('/mainList',restrictToAdmin,setMainList)
 productRouter.get('/mainList/:mainList',getProductsByMainList)
 
