@@ -2,6 +2,7 @@ const Order = require('./orderModel')
 const User = require('../users/userModel')
 const Product = require('../products/productModel')
 const OrderItem = require('../orderItems/orderItemModel')
+const Inventory = require('../Inventory/inventoryModel')
 
 const createOrder = async (req, res, next) => {
     try {
@@ -16,9 +17,9 @@ const createOrder = async (req, res, next) => {
         )
 
         req.body.orderItems.map(async orderItem=>{
-            await Product.findByIdAndUpdate(
-                orderItem.product._id,
-                { $inc :{stock : -orderItem.quantity}}
+            await Inventory.updateOne(
+                {_id: orderItem.selectedColor, "sizes.size":orderItem.selectedSize},
+                { $inc :{"sizes.stock" : -orderItem.quantity}}
             )
         })
 

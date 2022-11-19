@@ -19,7 +19,7 @@ const editQuantity = async(req,res,next)=>{
                 model:'SubCategory'
             }
         })
-        res.send({orderItem, message:'category added successfully'})
+        res.send({orderItem, message:'Quantity Updated Successfully'})
     }catch(error){
         error.status = 422;
         next(error)

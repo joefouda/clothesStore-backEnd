@@ -14,7 +14,12 @@ const orderItemSchema = new mongoose.Schema({
     orderPrice:{
         type:Number,
         required:true
-    }
+    },
+    selectedColor:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Inventory'
+    },
+    selectedSize:String
 })
 
 module.exports = orderItemSchema
