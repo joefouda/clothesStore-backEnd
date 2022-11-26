@@ -64,6 +64,16 @@ const createOrder = async (req, res, next) => {
                     path: 'user',
                     model: 'User',
                 }
+            }).populate({
+                path: 'orders',
+                populate: {
+                    path: 'orderItems',
+                    model: 'OrderItem',
+                    populate: {
+                        path: 'selectedColor',
+                        model: 'Inventory'
+                    },
+                }
             })
 
         res.send({ user: newUser, message: 'Order created successfully' })
@@ -93,6 +103,12 @@ const getAllOrders = async (req, res, next) => {
                     path: 'subCategory',
                     model: 'SubCategory'
                 },
+            },
+        }).populate({
+            path: 'orderItems',
+            populate: {
+                path: 'selectedColor',
+                model: 'Inventory'
             },
         }).populate('user')
 
@@ -127,6 +143,12 @@ const cancelOrder = async (req, res, next) => {
             populate: {
                 path: 'product',
                 model: 'Product'
+            },
+        }).populate({
+            path: 'orderItems',
+            populate: {
+                path: 'selectedColor',
+                model: 'Inventory'
             },
         })
         order.orderItems.map(async orderItem=>{
@@ -172,6 +194,16 @@ const cancelOrder = async (req, res, next) => {
             populate: {
                 path: 'user',
                 model: 'User',
+            }
+        }).populate({
+            path: 'orders',
+            populate: {
+                path: 'orderItems',
+                model: 'OrderItem',
+                populate: {
+                    path: 'selectedColor',
+                    model: 'Inventory'
+                },
             }
         })
 

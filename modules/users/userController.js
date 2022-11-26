@@ -92,6 +92,16 @@ const logIn = async (req, res, next) => {
         }).populate({
             path:'orders',
             populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'selectedColor',
+                    model:'Inventory',
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
                 path:'user',
                 model:'User',
             }
@@ -190,6 +200,16 @@ const getUserById = async (req, res, next) => {
         }).populate({
             path:'orders',
             populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'selectedColor',
+                    model:'Inventory',
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
                 path:'user',
                 model:'User',
             }
@@ -255,6 +275,16 @@ const updateUserInfo = async (req, res, next) => {
                         path:'subCategory',
                         model:'SubCategory'
                     }
+                }
+            }
+        }).populate({
+            path:'orders',
+            populate:{
+                path:'orderItems',
+                model:'OrderItem',
+                populate:{
+                    path:'selectedColor',
+                    model:'Inventory',
                 }
             }
         }).populate({

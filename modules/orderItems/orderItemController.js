@@ -6,7 +6,7 @@ const editQuantity = async(req,res,next)=>{
         let orderItem = await OrderItem.findByIdAndUpdate(req.body.orderItemID,{
             quantity:req.body.quantity,
             orderPrice:req.body.orderPrice
-        },{new:true}).populate('product').populate({
+        },{new:true}).populate('selectedColor').populate('product').populate({
             path:'product',
             populate: {
                 path:'category',
