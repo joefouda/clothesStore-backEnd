@@ -18,8 +18,8 @@ const createOrder = async (req, res, next) => {
 
         req.body.orderItems.map(async orderItem=>{
             await Inventory.updateOne(
-                {_id: orderItem.selectedColor, "sizes.size":orderItem.selectedSize},
-                { $inc :{"sizes.stock" : -orderItem.quantity}}
+                {_id: orderItem.selectedColor._id, "sizes.size":orderItem.selectedSize},
+                { $inc :{"sizes.$.stock" : -orderItem.quantity}}
             )
         })
 
@@ -216,6 +216,8 @@ const cancelOrder = async (req, res, next) => {
         next(error)
     }
 }
+
+// interview Tasks
 
 const getOrdersTotal = async(req, res, next) => {
     let orders = await Order.find({})

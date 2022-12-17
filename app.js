@@ -16,6 +16,7 @@ const imageRouter = require('./modules/images/imageRouter')
 const orderItemRouter = require('./modules/orderItems/orderItemRouter')
 const otherRouter = require('./modules/other/otherRouter')
 const mainListRouter = require('./modules/mainLists/mainListsRouter')
+const addressRouter = require('./modules/addresses/addressRouter')
 
 
 app.use(cors())
@@ -38,6 +39,7 @@ app.use(`${api}/image`, imageRouter)
 app.use(`${api}/orderitem`, orderItemRouter)
 app.use(`${api}/other`, otherRouter)
 app.use(`${api}/mainList`, mainListRouter)
+app.use(`${api}/address`, addressRouter)
 
 mongoose.connect('mongodb://localhost:27017/clothes-shope');
 app.listen(3000, () => {
